@@ -1,0 +1,207 @@
+---
+title: Morphometric distribution of depth and basin shape in Aotearoa New Zealand lakes
+format: 
+  revealjs:
+    theme: dark
+    logo: www/limnotrack_border.jpg
+    footer: "Footer text"
+    template-partials:
+      - title-slide.html
+author:
+  - name: Tadhg Moore
+    affiliation: Limnotrack
+    orcid: 0000-0002-3834-8868
+    email: tadhg@limnotrack.com
+  - name: Chris McBride
+    affiliation: Limnotrack
+editor: visual
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r}
+#| label: setup
+
+library(sf)
+fenz_depths <- readRDS("data/fenz_depths.rds") |> 
+  dplyr::filter(!is.na(z_max))
+n_fenz <- nrow(fenz_depths)
+
+library(ggplot2)
+
+```
+
+## Morphometric distribution of depth and basin shape in Aotearoa New Zealand lakes
+
+Tadhg Moore
+
+## Overview
+
+-   Background
+-   Methods
+-   Results
+-   Conclusions
+-   Future Work
+
+## Motivation
+
+-   Developing the Lake Ecosystem Research New Zealand modelling platfomr (LERNZmp).
+-   Lake depth and morphometry are key drivers of lake ecosystem function, therefore accurate depth data is essential.
+
+## Background {.smaller}
+
+::::: columns
+::: {.column width="50%"}
+-   Lack of a central database on lake morphometry, particularly depth
+-   Large number of bathymetric data has been recorded across lakes in New Zealand
+-   Current predictions of max lake depth, within the FENZ database (n=`r n_fenz`) are limited and have clear biases
+:::
+
+::: {.column width="50%"}
+```{r}
+#| label: fig-fenz-depth-distribution
+#| fig.cap: "Depth distribution of FENZ lakes"
+#| fig.width: 6
+#| fig.height: 6
+
+ggplot() +
+  geom_histogram(data = fenz_depths, aes(x = z_max),
+                 bins = 50, colour = "white") +
+  # geom_point(data = fenz_depths, aes(x = area_Ha, y = z_max)) +
+  scale_x_log10(breaks = c(1, 5, 10, 20, 50, 100, 400)) +
+  # scale_y_log10() +
+  labs(y = "Count", x = "Depth (m)")+
+  theme_bw(base_size = 16) 
+
+# library(plotly)
+# plot_ly() |> 
+#   add_histogram(data = fenz_depths, x = ~z_max, nbins = 50) |>
+#   layout(xaxis = list(title = "Depth (m)", type = "log"),
+#          yaxis = list(title = "Frequency"))
+# add_markers(data = fenz_depths, x = ~area_Ha, y = ~z_max,
+#             opacity = 0.3) |> 
+# layout(xaxis = list(type = "log", title = "Area (ha)"),
+#        yaxis = list(type = "log", title = "Depth (m)"))
+
+```
+:::
+:::::
+
+## Max depth vs Lake area
+
+```{r}
+#| label: fig-fenz-depth-area
+#| fig.cap: "Depth vs Area of FENZ lakes"
+
+ggplot() +
+  geom_point(data = fenz_depths, aes(x = area_Ha, y = z_max),
+             alpha = 0.2, size = 1) +
+  scale_y_log10(breaks = c(1, 5, 10, 20, 50, 100, 400)) +
+  scale_x_log10(breaks = c(1, 5, 10, 50, 100, 1000)) +
+  labs(x = "Area (ha)", y = "Depth (m)")+
+  theme_bw(base_size = 16) 
+
+```
+
+<!-- ## Locations of lakes with bathymetry data in New Zealand {.smaller} -->
+
+<!-- ```{r} -->
+<!-- #| echo: false -->
+<!-- #| include: false -->
+<!-- #| label: get-nz-regions-shapefile -->
+
+<!-- # Read the shapefile data from Stats NZ -->
+<!-- url <- "https://datafinder.stats.govt.nz/" # Base URL -->
+<!-- layer_id <- 111182 # Layer ID for the regional shapefile -->
+
+<!-- # Read the shapefile data -->
+<!-- nz_shapefile <- aemetools::read_web_sf(url = url, layer_id = layer_id, -->
+<!--                                        key = Sys.getenv("STATS_NZ_KEY")) -->
+
+<!-- # Remove the Chatham Islands from the shapefile -->
+<!-- nz_shapefile <- nz_shapefile |> -->
+<!--   dplyr::filter(C2023_V != "Area Outside Region") -->
+
+<!-- # Read the Coast shapefile data from LINZ -->
+<!-- url <- "https://data.linz.govt.nz/" # Base URL -->
+<!-- layer_id <- 51153 # Layer ID for the national coast line -->
+
+<!-- # Read the shapefile data -->
+<!-- nz_coast <- aemetools::read_web_sf(url = url, layer_id = layer_id) -->
+<!-- nz_coast <- nz_coast |>  -->
+<!--   sf::st_transform(2193) -->
+
+<!-- nz_coast <- sf::st_crop(nz_coast, nz_shapefile) -->
+<!-- nz_coast_simp <- sf::st_simplify(nz_coast, dTolerance = 100) -->
+
+<!-- nz_region_clip <- sf::st_intersection(nz_shapefile, nz_coast_simp) |>  -->
+<!--   dplyr::mutate(legend_name = gsub(" Region", "", C2023_V), -->
+<!--                 legend_name = gsub("\\?", "ū", legend_name)) -->
+
+<!-- # tm_shape(sub) + -->
+<!-- #   tm_borders(col = "black", lwd = 2) -->
+
+<!-- ``` -->
+
+<!-- ```{r} -->
+<!-- #| label: fig-fenz-map -->
+<!-- #| fig.cap: "Map of FENZ lakes" -->
+
+<!-- library(tmap) -->
+<!-- tmap_mode("view") -->
+<!-- tm_shape(nz_region_clip) + -->
+<!--   tm_borders(col = "black", lwd = 2)  -->
+
+<!-- # tm_shape(fenz_depths) + -->
+<!-- #   tm_polygons(col = "z_max", style = "cont") + -->
+<!-- #   tm_layout(legend.position = c("right", "bottom")) + -->
+<!-- #   tm_view() -->
+<!-- ``` -->
+
+## Methods {.smaller}
+
+-   Bathymetry survey data were sourced from a variety of sources - paper maps, digital files, and online databases (n=.
+-   Shoreline data were updated using satellite and aerial imagery.
+-   Depth data were interpolated using a Multilevel B-Spline Approximation (MBA) algorithm.
+-   Hypsographic curves were calculated for each lake.
+-   Comparison of depth and area with other databases.
+-   Used machine learning to predict lake depth from morphometric data for all lakes in New Zealand and benchmark against the FENZ dataset.
+
+## Results {.r-fit-text}
+
+```{r}
+#| label: model-results
+
+max_depth_r2 <- 0.8
+mean_depth_r2 <- 0.6
+
+fenz_max_depth_r2 <- 0.4
+fenz_mean_depth_r2 <- 0.2
+
+```
+
+Bathymetric data from 156 lakes were digitised and collated for use in this study.
+
+Using a machine learning model, we were able to predict maximum lake depth from morphometric data with an $r^2$ = `r max_depth_r2` and mean lake depth with an $r^2$ = `r mean_depth_r2`.
+
+This was substantially better than the FENZ dataset, which had an $r^2$ = `r fenz_max_depth_r2` for max depth and `r fenz_mean_depth_r2` for mean depth.
+
+## Predicting mean and max depth {.smaller}
+
+:::::: panel-tabset
+### Max depth
+
+::::: columns
+::: {.column width="50%"}
+Figure
+:::
+
+::: {.column width="50%"}
+Table of fit
+:::
+:::::
+
+### Mean depth
+
+Content for `Tab B`
+::::::
