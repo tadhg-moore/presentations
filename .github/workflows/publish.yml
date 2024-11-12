@@ -10,6 +10,10 @@ jobs:
     runs-on: windows-latest
     permissions:
       contents: write
+    
+    env:
+      LINZ_BASEMAP_KEY: ${{ secrets.LINZ_BASEMAP_KEY }}  
+    
     steps:
       - name: Check out repository
         uses: actions/checkout@v4

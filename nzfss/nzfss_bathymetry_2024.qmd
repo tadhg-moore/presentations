@@ -107,15 +107,15 @@ ggplot() +
 
 
 ```{r}
-
 #| label: fig-fenz-map
-
 #| fig.cap: "Map of FENZ lakes"
-
 library(tmap)
+bmap <- paste0("https://basemaps.linz.govt.nz/v1/tiles/aerial/WebMercatorQuad/{z}/{x}/{y}.webp?api=", 
+               Sys.getenv("LINZ_BASEMAP_KEY"))
+tmap_options(basemaps = "https://basemaps.linz.govt.nz/v1/tiles/aerial/WebMercatorQuad/{z}/{x}/{y}.webp?api=c01hsah0ttthgq51dgrqbw9r2bd", check.and.fix = TRUE)
 nz_region_clip <- readRDS("data/nz_region_clip.rds")
 tmap_mode("view")
-tm_shape(nz_region_clip) +
+tm_shape(nz_region_clip, name = "Region") +
   tm_borders(col = "black", lwd = 2)
 
 
