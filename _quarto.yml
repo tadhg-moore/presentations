@@ -1,3 +1,17 @@
 project:
   type: website
   output-dir: docs
+
+website:
+  title: "My Quarto Presentations"
+  navbar:
+    right:
+      - text: "Home"
+        href: index.qmd
+      - text: "NZFSS Presentation"
+        href: nzfss/your_presentation.html
+
+format:
+  html:
+    theme: default
+    css: styles.css # Optional for custom styling
