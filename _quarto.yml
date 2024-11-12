@@ -9,9 +9,9 @@ website:
       - text: "Home"
         href: index.qmd
       - text: "NZFSS Presentation"
-        href: nzfss/your_presentation.html
+        href: nzfss/nzfss_bathymetry_2024.html
 
 format:
   html:
-    theme: default
+    theme: darkly
     css: styles.css # Optional for custom styling
