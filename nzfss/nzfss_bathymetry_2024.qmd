@@ -106,56 +106,83 @@ ggplot() +
 <!-- ## Locations of lakes with bathymetry data in New Zealand {.smaller} -->
 
 <!-- ```{r} -->
+
 <!-- #| echo: false -->
+
 <!-- #| include: false -->
+
 <!-- #| label: get-nz-regions-shapefile -->
 
 <!-- # Read the shapefile data from Stats NZ -->
+
 <!-- url <- "https://datafinder.stats.govt.nz/" # Base URL -->
+
 <!-- layer_id <- 111182 # Layer ID for the regional shapefile -->
 
 <!-- # Read the shapefile data -->
+
 <!-- nz_shapefile <- aemetools::read_web_sf(url = url, layer_id = layer_id, -->
+
 <!--                                        key = Sys.getenv("STATS_NZ_KEY")) -->
 
 <!-- # Remove the Chatham Islands from the shapefile -->
+
 <!-- nz_shapefile <- nz_shapefile |> -->
+
 <!--   dplyr::filter(C2023_V != "Area Outside Region") -->
 
 <!-- # Read the Coast shapefile data from LINZ -->
+
 <!-- url <- "https://data.linz.govt.nz/" # Base URL -->
+
 <!-- layer_id <- 51153 # Layer ID for the national coast line -->
 
 <!-- # Read the shapefile data -->
+
 <!-- nz_coast <- aemetools::read_web_sf(url = url, layer_id = layer_id) -->
+
 <!-- nz_coast <- nz_coast |>  -->
+
 <!--   sf::st_transform(2193) -->
 
 <!-- nz_coast <- sf::st_crop(nz_coast, nz_shapefile) -->
+
 <!-- nz_coast_simp <- sf::st_simplify(nz_coast, dTolerance = 100) -->
 
 <!-- nz_region_clip <- sf::st_intersection(nz_shapefile, nz_coast_simp) |>  -->
+
 <!--   dplyr::mutate(legend_name = gsub(" Region", "", C2023_V), -->
+
 <!--                 legend_name = gsub("\\?", "ū", legend_name)) -->
 
 <!-- # tm_shape(sub) + -->
+
 <!-- #   tm_borders(col = "black", lwd = 2) -->
 
 <!-- ``` -->
 
 <!-- ```{r} -->
+
 <!-- #| label: fig-fenz-map -->
+
 <!-- #| fig.cap: "Map of FENZ lakes" -->
 
 <!-- library(tmap) -->
+
 <!-- tmap_mode("view") -->
+
 <!-- tm_shape(nz_region_clip) + -->
+
 <!--   tm_borders(col = "black", lwd = 2)  -->
 
 <!-- # tm_shape(fenz_depths) + -->
+
 <!-- #   tm_polygons(col = "z_max", style = "cont") + -->
+
 <!-- #   tm_layout(legend.position = c("right", "bottom")) + -->
+
 <!-- #   tm_view() -->
+
 <!-- ``` -->
 
 ## Methods {.smaller}
