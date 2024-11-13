@@ -4,7 +4,7 @@ format:
   revealjs:
     theme: dark
     logo: www/limnotrack_border.jpg
-    footer: "Footer text"
+    footer: ""
     template-partials:
       - title-slide.html
 author:
@@ -14,9 +14,12 @@ author:
     email: tadhg@limnotrack.com
   - name: Chris McBride
     affiliation: Limnotrack
+  - name: Deniz Özkundakci
+    affiliation: The University of Waikato
 editor: visual
 editor_options: 
   chunk_output_type: console
+bibliography: references.bib
 ---
 
 ```{r}
@@ -24,16 +27,32 @@ editor_options:
 
 library(sf)
 fenz_depths <- readRDS("data/fenz_depths.rds") |> 
-  dplyr::filter(!is.na(z_max))
+  dplyr::filter(!is.na(z_max), !is.na(GeomorphicType))
 n_fenz <- nrow(fenz_depths)
 
+lernz_depths <- read.csv("data/lernz_depths.csv")
+lyr <- readRDS("data/lyr.rds")
+id_names <- lyr |> 
+  sf::st_drop_geometry() |>
+  dplyr::select(id_final, name_final)
+
 library(ggplot2)
+library(plotly)
+
+
+# Set geomorphology colours
+geomorph_class <- unique(fenz_depths$GeomorphicType)
+geomorph_class <- geomorph_class[!is.na(geomorph_class)]
+geomorph_class <- c(geomorph_class, "Unknown")
+geomorph_cols <- RColorBrewer::brewer.pal(length(geomorph_class), "Set3")
+names(geomorph_cols) <- geomorph_class
+
+# Set source colours
+source_cols <- c("FENZ" = "#8DA0CB", "Hydrolakes" = "#FC8D62", 
+                 "GloBATHY" = "#A6D854", "Model" = "black")
+sc_df <- data.frame(source = names(source_cols), col = source_cols)
 
 ```
-
-## Morphometric distribution of depth and basin shape in Aotearoa New Zealand lakes
-
-Tadhg Moore
 
 ## Overview
 
@@ -43,35 +62,52 @@ Tadhg Moore
 -   Conclusions
 -   Future Work
 
-## Motivation
+## Motivation {.smaller}
 
--   Developing the Lake Ecosystem Research New Zealand modelling platfomr (LERNZmp).
--   Lake depth and morphometry are key drivers of lake ecosystem function, therefore accurate depth data is essential.
+-   Developing the Lake Ecosystem Research New Zealand modelling platfom (LERNZmp). ![](www/lernzmp_logo.png){width="105"}
+-   Lake depth and morphometry are key drivers of lake ecosystem function [@ganz2024], therefore accurate depth data is essential.
+-   The Freshwater Ecosystems New Zealand (FENZ) database is the most comprehensive database of lake morphometry in New Zealand, but is limited in its depth data.
+-   NZ lakes provide a unique opportunity to develop a comprehensive database of lake depth and morphometry, particularly given the diversity of lake size, depth and geomorphic type.
+
+## Objectives 
+
+-   Develop a comprehensive database of lake depth and morphometry for New Zealand.
+-   Use machine learning to predict mean and maximum lake depth from this data.
+-   Compare these predictions to the FENZ database and other global lake depth databases e.g. maximum lake depths - GLOBathy[@khazaei2022] and mean lake depth - HydroLAKES [@messager2016]
 
 ## Background {.smaller}
 
 ::::: columns
-::: {.column width="50%"}
+::: {.column width="30%"}
 -   Lack of a central database on lake morphometry, particularly depth
 -   Large number of bathymetric data has been recorded across lakes in New Zealand
 -   Current predictions of max lake depth, within the FENZ database (n=`r n_fenz`) are limited and have clear biases
 :::
 
-::: {.column width="50%"}
+::: {.column width="70%"}
 ```{r}
 #| label: fig-fenz-depth-distribution
-#| fig.cap: "Depth distribution of FENZ lakes"
+#| fig.cap: "Depth distribution of FENZ lakes by geomorphic type"
 #| fig.width: 6
 #| fig.height: 6
 
+labs <- fenz_depths |> 
+  sf::st_drop_geometry() |> 
+  dplyr::group_by(GeomorphicType) |>
+  dplyr::summarise(n = dplyr::n()) |>
+  dplyr::mutate(label = paste0(GeomorphicType, " (n=", n, ")"))
+
+df <- fenz_depths |> 
+  sf::st_drop_geometry() |> 
+  dplyr::left_join(labs, by = "GeomorphicType")
+
 ggplot() +
-  geom_histogram(data = fenz_depths, aes(x = z_max),
-                 bins = 50, colour = "white") +
-  # geom_point(data = fenz_depths, aes(x = area_Ha, y = z_max)) +
-  scale_x_log10(breaks = c(1, 5, 10, 20, 50, 100, 400)) +
-  # scale_y_log10() +
+  geom_histogram(data = df, aes(x = z_max),
+                 bins = 30, colour = "white") +
+  facet_wrap(~label, scales = "free_y") +
+  scale_x_log10(breaks = c(1, 5, 10, 50, 100, 400)) +
   labs(y = "Count", x = "Depth (m)")+
-  theme_bw(base_size = 16) 
+  theme_bw(base_size = 14) 
 
 # library(plotly)
 # plot_ly() |> 
@@ -103,23 +139,52 @@ ggplot() +
 
 ```
 
-## Locations of lakes with bathymetry data in New Zealand {.smaller}
+## Lakes with bathymetry data {.smaller}
 
+::::: columns
+::: {.column width="50%"}
+-   Lakes with bathymetric data are relatively evenly distributed across New Zealand.
+-   Lake geomorphic type is highly regionalised.
+:::
+::: {.column width="50%"}
 
 ```{r}
 #| label: fig-fenz-map
-#| fig.cap: "Map of FENZ lakes"
+#| fig.cap: "Map of lakes with bathymetric data and maximum depth data in New Zealand. Lakes with bathymetry data have a black marker."
+#| fig.width: 3.75
+#| fig.height: 5
 library(tmap)
 bmap <- paste0("https://basemaps.linz.govt.nz/v1/tiles/aerial/WebMercatorQuad/{z}/{x}/{y}.webp?api=", 
                Sys.getenv("LINZ_BASEMAP_KEY"))
 tmap_options(basemaps = "https://basemaps.linz.govt.nz/v1/tiles/aerial/WebMercatorQuad/{z}/{x}/{y}.webp?api=c01hsah0ttthgq51dgrqbw9r2bd", check.and.fix = TRUE)
 nz_region_clip <- readRDS("data/nz_region_clip.rds")
-tmap_mode("view")
-tm_shape(nz_region_clip, name = "Region") +
-  tm_borders(col = "black", lwd = 2)
+# tmap_mode("view")
+# tm_shape(nz_region_clip, name = "Region") +
+#   tm_borders(col = "black", lwd = 2)
+# 
+tmap_mode("plot")
 
+depth_lakes <- lyr |> 
+  dplyr::filter(id_final %in% lernz_depths$id_final, !is.na(max_depth)) |> 
+  sf::st_point_on_surface()
+bathy_lakes <- depth_lakes |> 
+  dplyr::filter(bathy)
+
+tm_shape(nz_region_clip, name = "Region") +
+  tm_fill(col = "legend_name", title = "Region", alpha = 0.8, legend.show = F) +
+  tm_layout(legend.position = c("left", "top")) +
+  tm_shape(depth_lakes, name = "Lake marker") +
+  tm_symbols(col = "GeomorphicType", size = 0.3, title.col = "Geomorphic type",
+             palette = geomorph_cols) +
+  tm_shape(bathy_lakes, name = "Bathy lakes") +
+  tm_symbols(col = "black", size = 0.05) +
+  tm_compass(position = c("right", "top")) +
+  tm_scale_bar(text.size = 0.6, position = c("right", "bottom")) 
 
 ```
+
+:::
+:::::
 
 ## Methods {.smaller}
 
@@ -130,24 +195,6 @@ tm_shape(nz_region_clip, name = "Region") +
 -   Comparison of depth and area with other databases.
 -   Used machine learning to predict lake depth from morphometric data for all lakes in New Zealand and benchmark against the FENZ dataset.
 
-## Results {.r-fit-text}
-
-```{r}
-#| label: model-results
-
-max_depth_r2 <- 0.8
-mean_depth_r2 <- 0.6
-
-fenz_max_depth_r2 <- 0.4
-fenz_mean_depth_r2 <- 0.2
-
-```
-
-Bathymetric data from 156 lakes were digitised and collated for use in this study.
-
-Using a machine learning model, we were able to predict maximum lake depth from morphometric data with an $r^2$ = `r max_depth_r2` and mean lake depth with an $r^2$ = `r mean_depth_r2`.
-
-This was substantially better than the FENZ dataset, which had an $r^2$ = `r fenz_max_depth_r2` for max depth and `r fenz_mean_depth_r2` for mean depth.
 
 ## Predicting mean and max depth {.smaller}
 
@@ -155,16 +202,207 @@ This was substantially better than the FENZ dataset, which had an $r^2$ = `r fen
 ### Max depth
 
 ::::: columns
-::: {.column width="50%"}
-Figure
+::: {.column width="60%"}
+
+```{css}
+#| echo: false
+
+.reveal table {
+  font-size: smaller;
+}
+
+```
+
+```{r}
+#| label: fig-max-depth
+#| fig.cap: "Predicted vs observed max depth. Note that the x and y axes are log10 scaled."
+#| fig.width: 6
+
+comp_max_depth <- read.csv("data/comp_max_depth.csv") |> 
+  dplyr::filter(source != "Hydrolakes") |> 
+  dplyr::rename(`Measured depth` = z_max, `Predicted depth` = LERNZmp) |> 
+  dplyr::left_join(id_names, by = c("id_final" = "id_final"))
+comp_mean_depth <- read.csv("data/comp_mean_depth.csv") |> 
+  dplyr::filter(source != "GloBATHY")
+
+cols <- comp_max_depth |> 
+  dplyr::select(source, label) |> 
+  dplyr::distinct() |> 
+  dplyr::left_join(sc_df, by = "source") 
+cols_vec <- cols$col
+names(cols_vec) <- cols$label
+
+lims <- range(comp_max_depth$`Predicted depth`, comp_max_depth$`Measured depth`,
+              # comp_mean_depth$z_mean, comp_mean_depth$LERNZmp,
+              na.rm = TRUE)
+brks <- c(1, 10, 100)
+
+
+plot_ly() |> 
+  add_trace(data = comp_max_depth, x = ~`Measured depth`,
+            y = ~`Predicted depth`, colors = cols_vec,
+            hoverinfo = "text",
+            text = paste0("Lake: ", comp_max_depth$name_final, "<br>",
+                               "Predicted depth: ", round(comp_max_depth$`Predicted depth`, 1), "<br>",
+                               "Measured depth: ", round(comp_max_depth$`Measured depth`, 1), "<br>",
+                               "Source: ", comp_max_depth$label),
+            type = "scatter", mode = "markers", color = ~label) |> 
+  add_trace(x = lims, y = lims, type = "scatter", mode = "lines", name = "1:1 line",
+            showlegend = TRUE, line = list(color = "grey")) |> 
+  layout(xaxis = list(title = "Measured max depth (m)", type = "log", range = log10(lims)),
+         yaxis = list(title = "Predicted max depth (m)", type = "log", range = log10(lims)),
+         legend = list(orientation = "h", x = 0.2, y = -0.2))
+
+
+```
+
 :::
 
-::: {.column width="50%"}
-Table of fit
+::: {.column width="40%"}
+```{r}
+#| label: tbl-max-depth
+#| tbl.cap: "Model fit for max depth"
+
+tbl <- comp_max_depth |> 
+  dplyr::rename(z_max = `Measured depth`, LERNZmp = `Predicted depth`) |> 
+  dplyr::filter(!is.na(LERNZmp)) |> 
+  dplyr::mutate(diff = LERNZmp - z_max,
+                prop_error = abs(diff) / z_max) |>
+  dplyr::group_by(source) |>
+  dplyr::summarise(bias = mean(diff, na.rm = TRUE),
+                   mae = mean(abs(diff), na.rm = TRUE),
+                   rmse = sqrt(mean(diff^2, na.rm = TRUE)),
+                   r2 = ifelse(all(is.na(diff)), NA, cor(LERNZmp, z_max, use = "complete.obs")^2),
+                   pe = mean(prop_error, na.rm = TRUE),
+                   n = sum(!is.na(diff))
+                   ) |>
+  dplyr::mutate(source = factor(source, levels = c( "FENZ", "Hydrolakes", "GloBATHY", "Model")),
+                variable = "Lake max depth") |>
+  dplyr::select(source, n, bias, rmse, r2) |>
+  # Round all numeric to 2 digits
+  dplyr::mutate_if(is.numeric, ~round(., 2)) |>
+  dplyr::rename(R2 = r2, RMSE = rmse, Bias = bias, N = n, Source = source)
+
+max_depth_r2 <- tbl |> 
+  dplyr::filter(Source == "Model") |> 
+  dplyr::pull(R2)
+
+fenz_max_depth_r2 <- tbl |> 
+  dplyr::filter(Source == "FENZ") |> 
+  dplyr::pull(R2)
+
+tbl |>
+  knitr::kable(caption = "Model fit for max depth") 
+```
+
 :::
 :::::
 
 ### Mean depth
 
-Content for `Tab B`
+::::: columns
+::: {.column width="60%"}
+
+```{r}
+#| label: fig-mean-depth
+#| fig.cap: "Predicted vs observed mean depth. Note that the x and y axes are log10 scaled."
+#| fig.width: 6
+
+comp_mean_depth <- read.csv("data/comp_mean_depth.csv") |> 
+  dplyr::filter(source != "GloBATHY", !is.na(LERNZmp)) |> 
+  dplyr::rename(`Measured depth` = z_mean, `Predicted depth` = LERNZmp) |> 
+  dplyr::left_join(id_names, by = c("id_final" = "id_final"))
+
+cols <- comp_mean_depth |> 
+  dplyr::select(source, label) |> 
+  dplyr::distinct() |> 
+  dplyr::left_join(sc_df, by = "source") 
+cols_vec <- cols$col
+names(cols_vec) <- cols$label
+
+lims <- range(comp_mean_depth$`Predicted depth`, comp_mean_depth$`Measured depth`,
+              # comp_mean_depth$z_mean, comp_mean_depth$LERNZmp,
+              na.rm = TRUE)
+brks <- c(1, 10, 100)
+
+
+plot_ly() |> 
+  add_trace(data = comp_mean_depth, x = ~`Measured depth`,
+            y = ~`Predicted depth`, colors = cols_vec,
+            hoverinfo = "text",
+            text = paste0("Lake: ", comp_mean_depth$name_final, "<br>",
+                               "Predicted depth: ", round(comp_mean_depth$`Predicted depth`, 1), "<br>",
+                               "Measured depth: ", round(comp_mean_depth$`Measured depth`, 1), "<br>",
+                               "Source: ", comp_mean_depth$label),
+            type = "scatter", mode = "markers", color = ~label) |> 
+  add_trace(x = lims, y = lims, type = "scatter", mode = "lines", name = "1:1 line",
+            showlegend = TRUE, line = list(color = "grey")) |> 
+  layout(xaxis = list(title = "Measured mean depth (m)", type = "log", range = log10(lims)),
+         yaxis = list(title = "Predicted mean depth (m)", type = "log", range = log10(lims)),
+         legend = list(orientation = "h", x = 0.2, y = -0.2))
+
+
+```
+
+:::
+
+::: {.column width="40%"}
+```{r}
+#| label: tbl-mean-depth
+#| tbl.cap: "Model fit for mean depth"
+
+tbl <- comp_mean_depth |> 
+  dplyr::rename(z_mean = `Measured depth`, LERNZmp = `Predicted depth`) |> 
+  dplyr::filter(!is.na(LERNZmp)) |> 
+  dplyr::mutate(diff = LERNZmp - z_mean,
+                prop_error = abs(diff) / z_mean) |>
+  dplyr::group_by(source) |>
+  dplyr::summarise(bias = mean(diff, na.rm = TRUE),
+                   mae = mean(abs(diff), na.rm = TRUE),
+                   rmse = sqrt(mean(diff^2, na.rm = TRUE)),
+                   r2 = ifelse(all(is.na(diff)), NA, cor(LERNZmp, z_mean, use = "complete.obs")^2),
+                   pe = mean(prop_error, na.rm = TRUE),
+                   n = sum(!is.na(diff))
+                   ) |>
+  dplyr::mutate(source = factor(source, levels = c( "FENZ", "Hydrolakes", "GloBATHY", "Model")),
+                variable = "Lake mean depth") |>
+  dplyr::select(source, n, bias, rmse, r2) |>
+  # Round all numeric to 2 digits
+  dplyr::mutate_if(is.numeric, ~round(., 2)) |>
+  dplyr::rename(R2 = r2, RMSE = rmse, Bias = bias, N = n, Source = source)
+
+mean_depth_r2 <- tbl |> 
+  dplyr::filter(Source == "Model") |> 
+  dplyr::pull(R2)
+
+fenz_mean_depth_r2 <- tbl |> 
+  dplyr::filter(Source == "FENZ") |> 
+  dplyr::pull(R2)
+
+tbl |>
+  knitr::kable(caption = "Model fit for mean depth") 
+```
+
+:::
+:::::
 ::::::
+
+
+## Results {.r-fit-text}
+
+Bathymetric data from 156 lakes were digitised and collated for use in this study.
+
+Using a machine learning model, we were able to predict maximum lake depth from morphometric data with an $r^2$ = `r max_depth_r2` and mean lake depth with an $r^2$ = `r mean_depth_r2`.
+
+This was substantially better than the FENZ dataset, which had an $r^2$ = `r fenz_max_depth_r2` for max depth and `r fenz_mean_depth_r2` for mean depth.
+
+## Applications
+
+-   Predicted depth data is used in the LERNZmp for lakes without bathymetric data.
+-   Highlights lakes with limited depth data for future surveying.
+-   Provides a comprehensive database of lake depth and morphometry for Aotearoa New Zealand for future research.
+
+## References
+
+::: {#refs}
+:::
