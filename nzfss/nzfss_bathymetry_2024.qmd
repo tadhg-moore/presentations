@@ -216,7 +216,8 @@ tm_shape(nz_region_clip, name = "Region") +
 ```{r}
 #| label: fig-max-depth
 #| fig.cap: "Predicted vs observed max depth. Note that the x and y axes are log10 scaled."
-#| fig.width: 6
+#| fig.width: 3
+#| fig.height: 3
 
 comp_max_depth <- read.csv("data/comp_max_depth.csv") |> 
   dplyr::filter(source != "Hydrolakes") |> 
@@ -306,7 +307,8 @@ tbl |>
 ```{r}
 #| label: fig-mean-depth
 #| fig.cap: "Predicted vs observed mean depth. Note that the x and y axes are log10 scaled."
-#| fig.width: 6
+#| fig.width: 4
+#| fig.height: 4
 
 comp_mean_depth <- read.csv("data/comp_mean_depth.csv") |> 
   dplyr::filter(source != "GloBATHY", !is.na(LERNZmp)) |> 
