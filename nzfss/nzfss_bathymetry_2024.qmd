@@ -5,8 +5,22 @@ format:
     theme: dark
     logo: www/limnotrack_border.jpg
     footer: ""
+    toc: true
     template-partials:
       - title-slide.html
+    transition: slide
+    background-transition: fade
+    controls: true
+    controls-layout: bottom-right
+    chalkboard: false
+    menu: false
+    simplemenu:
+        flat: true
+        barhtml:
+            header: "<div class='menubar'><a class='logo' href='#'><img src='img/www/limnotrack_border.jpg'></a><ul class='menu'></ul><div class='slide-number'></div><div>"
+        scale: 0.8
+revealjs-plugins:
+    - simplemenu
 author:
   - name: Tadhg Moore
     affiliation: Limnotrack
@@ -54,9 +68,9 @@ sc_df <- data.frame(source = names(source_cols), col = source_cols)
 
 ```
 
-## Overview
+## Overview {data-state="hide-menubar"}
 
--   Background
+-   (Background)[#Background]
 -   Methods
 -   Results
 -   Conclusions
@@ -75,7 +89,7 @@ sc_df <- data.frame(source = names(source_cols), col = source_cols)
 -   Use machine learning to predict mean and maximum lake depth from this data.
 -   Compare these predictions to the FENZ database and other global lake depth databases e.g. maximum lake depths - GLOBathy[@khazaei2022] and mean lake depth - HydroLAKES [@messager2016]
 
-## Background {.smaller}
+## Background {.smaller data-name="Background"}
 
 ::::: columns
 ::: {.column width="30%"}
@@ -186,7 +200,7 @@ tm_shape(nz_region_clip, name = "Region") +
 :::
 :::::
 
-## Methods {.smaller}
+## Methods {.smaller data-name="Methods"}
 
 -   Bathymetry survey data were sourced from a variety of sources - paper maps, digital files, and online databases (n=.
 -   Shoreline data were updated using satellite and aerial imagery.
@@ -196,7 +210,7 @@ tm_shape(nz_region_clip, name = "Region") +
 -   Used machine learning to predict lake depth from morphometric data for all lakes in New Zealand and benchmark against the FENZ dataset.
 
 
-## Predicting mean and max depth {.smaller}
+## Predicting mean and max depth {.smaller data-name="Results"}
 
 :::::: panel-tabset
 ### Max depth
@@ -398,7 +412,7 @@ Using a machine learning model, we were able to predict maximum lake depth from 
 
 This was substantially better than the FENZ dataset, which had an $r^2$ = `r fenz_max_depth_r2` for max depth and `r fenz_mean_depth_r2` for mean depth.
 
-## Applications
+## Applications {.smaller data-name="Conclusions"}
 
 -   Predicted depth data is used in the LERNZmp for lakes without bathymetric data.
 -   Highlights lakes with limited depth data for future surveying.
