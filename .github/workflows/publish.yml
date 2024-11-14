@@ -29,6 +29,10 @@ jobs:
         with:
           cache-version: 1
 
+       - name: Install Quarto Extension "simplemenu"
+        run: |
+          quarto add martinomagnifico/quarto-simplemenu
+          
       - name: Render and Publish
         uses: quarto-dev/quarto-actions/publish@v2
         with:
