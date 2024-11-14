@@ -31,7 +31,7 @@ jobs:
 
       - name: Install Quarto Extension "simplemenu"
         run: |
-          quarto add martinomagnifico/quarto-simplemenu
+          quarto add martinomagnifico/quarto-simplemenu --no-prompt
           
       - name: Render and Publish
         uses: quarto-dev/quarto-actions/publish@v2
