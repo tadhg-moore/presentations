@@ -67,6 +67,8 @@ id_names <- lyr |>
   sf::st_drop_geometry() |>
   dplyr::select(id_final, name_final)
 
+lake_summ <- read.csv("data/lake_bathy_summary.csv")
+
 library(ggplot2)
 library(plotly)
 
@@ -191,7 +193,7 @@ plot_ly() |>
 :::
 :::::
 
-## Max depth vs Lake area
+## Max depth vs Lake area {.unnumbered .unlisted}
 
 ```{r}
 #| label: fig-fenz-depth-area
@@ -207,7 +209,7 @@ ggplot() +
 
 ```
 
-## Lakes with bathymetry data {.smaller}
+## Lakes with bathymetry data {.smaller .unnumbered .unlisted}
 
 ::::: columns
 ::: {.column width="50%"}
@@ -264,7 +266,49 @@ tm_shape(nz_region_clip, name = "Region") +
 -   Used machine learning to predict lake depth from morphometric data for all lakes in New Zealand and benchmark against the FENZ dataset.
 
 
-## Predicting mean and max depth {.smaller data-name="Results"}
+## Lake depth-area relationship {.smaller data-name="Results" .unnumbered .unlisted}
+
+```{r}
+#| label: fig-depth-area-latitude
+#| fig-cap: Summary of measured lake area and max depth by latitude and elevation.
+#| fig.width: 4
+#| fig.height: 4
+
+# p1 <- ggplot(lake_summ) +
+#   geom_hline(yintercept = 5, linetype = "dashed", colour = "black") +
+#   geom_vline(xintercept = 5, linetype = "dashed", colour = "black") +
+#   geom_point(aes(area_Ha, z_max, colour = lat,# shape = form_DV,
+#                  size = elevation), alpha = 0.8) +
+#   theme_bw() +
+#   scale_x_log10() +
+#   scale_y_log10() +
+#   annotation_logticks() +
+#   scale_colour_fermenter(palette = "RdYlBu") +
+#   scale_size_binned(breaks = c(0, 250, 500, 750, 1000, 2000)) +
+#   labs(x = "Surface area (Ha)", y = "Max depth (m)", colour = "Latitude",
+#        size = "Elevation (m)", shape = "Form") +
+#   theme(legend.position = "right")
+# p1
+
+plot_ly() |> 
+  add_markers(data = lake_summ, x = ~area_Ha, y = ~z_max, color = ~lat,
+              size = ~elevation, colors = c("#73D2DE", "#FFBC42", "#D81159"),
+              hoverinfo = "text",
+              text = paste0("Lake: ", lake_summ$name_final, "<br>",
+                            "Area: ", round(lake_summ$area_Ha, 1), " Ha<br>",
+                            "Max depth: ", round(lake_summ$z_max, 1), " m<br>",
+                            "Latitude: ", round(lake_summ$lat, 1), "°<br>",
+                            "Elevation: ", round(lake_summ$elevation, 1), " m")) |> 
+  layout(xaxis = list(title = "Surface area (Ha)", type = "log"),
+         yaxis = list(title = "Max depth (m)", type = "log"),
+         legend = list(orientation = "h", x = 0.2, y = -0.2)) |> 
+  colorbar(title = "Latitude") 
+
+
+```
+
+
+## Predicting mean and max depth {.smaller .unnumbered .unlisted}
 
 :::::: panel-tabset
 ### Max depth
@@ -457,8 +501,15 @@ tbl |>
 :::::
 ::::::
 
+## Distribution of volume development
 
-## Results {.r-fit-text}
+Development of Volume, $D_V$ (Hutchinson 1957) is a measure of departure of the shape of the lake basin from that of a cone calculated using the maximum depth $Z_{max}$ and the average depth $\bar{Z}$ :
+
+$$D_V = \frac{3 \times \bar{Z}}{Z_{max}}$$
+
+For the majority of lakes, DV \>1 (i.e. a conical depression). DV is greatest in shallow lakes with flat bottoms.
+
+## Machine learning {.r-fit-text .unnumbered .unlisted}
 
 Bathymetric data from 156 lakes were digitised and collated for use in this study.
 
@@ -472,7 +523,7 @@ This was substantially better than the FENZ dataset, which had an $r^2$ = `r fen
 -   Highlights lakes with limited depth data for future surveying.
 -   Provides a comprehensive database of lake depth and morphometry for Aotearoa New Zealand for future research.
 
-## References
+## References {.unnumbered .unlisted}
 
 ::: {#refs}
 :::
