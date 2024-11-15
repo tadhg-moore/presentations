@@ -15,3 +15,4 @@ format:
   html:
     theme: darkly
     css: styles.css # Optional for custom styling
+    title-prefix: ""
