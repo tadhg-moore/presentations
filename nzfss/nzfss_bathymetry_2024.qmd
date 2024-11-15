@@ -8,7 +8,7 @@ format:
     title-slide-attributes:
       data-state: "hide-menubar"
     footer: ""
-    toc: true
+    toc: false
     # template-partials:
     #   - title-slide.html
     transition: slide
@@ -17,6 +17,7 @@ format:
     controls-layout: bottom-right
     chalkboard: false
     menu: false
+    view-distance: 100
     simplemenu:
         flat: true
         barhtml:
@@ -25,26 +26,29 @@ format:
 revealjs-plugins:
     - simplemenu
 author:
-  - name: Tadhg Moore
-    affiliation: Limnotrack
+  - name: Tadhg Moore, Chris McBride, Deniz Özkundakci, Mathew Allen, Moritz K Lehmann, Matthew J Prentice, Whitney Woelmer, Maggie Armstrong, Kevin Rose
+    # affiliation: Limnotrack, The University of Waikato, Waikato Regional Council, Starboard Maritime Intelligence, Rensselaer Polytechnic Institute
     # orcid: 0000-0002-3834-8868
-    # email: tadhg@limnotrack.com
-  - name: Chris McBride
-    affiliation: Limnotrack
-  - name: Deniz Özkundakci
-    affiliation: The University of Waikato
-  - name: Mathew Allen
-    affiliation: Waikato Regional Council
-  - name: Moritz K Lehmann
-    affiliation: Starboard Maritime Intelligence
-  - name: Matthew J Prentice
-    affiliation: The University of Waikato
-  - name: Whitney Woelmer
-    affiliation: The University of Waikato
-  - name: Maggie Armstrong
-    affiliation: The University of Waikato
-  - name: Kevin Rose
-    affiliation: Rensselaer Polytechnic Institute
+    # email:
+  #   affiliation: Limnotrack
+  #   # orcid: 0000-0002-3834-8868
+  #   # email: tadhg@limnotrack.com
+  # - name: Chris McBride
+  #   affiliation: Limnotrack
+  # - name: Deniz Özkundakci
+  #   affiliation: The University of Waikato
+  # - name: Mathew Allen
+  #   affiliation: Waikato Regional Council
+  # - name: Moritz K Lehmann
+  #   affiliation: Starboard Maritime Intelligence
+  # - name: Matthew J Prentice
+  #   affiliation: The University of Waikato
+  # - name: Whitney Woelmer
+  #   affiliation: The University of Waikato
+  # - name: Maggie Armstrong
+  #   affiliation: The University of Waikato
+  # - name: Kevin Rose
+  #   affiliation: Rensselaer Polytechnic Institute
 editor: visual
 editor_options: 
   chunk_output_type: console
@@ -272,7 +276,7 @@ tm_shape(nz_region_clip, name = "Region") +
 #| label: fig-depth-area-latitude
 #| fig-cap: Summary of measured lake area and max depth by latitude and elevation.
 #| fig.width: 4
-#| fig.height: 4
+#| fig.height: 5
 
 # p1 <- ggplot(lake_summ) +
 #   geom_hline(yintercept = 5, linetype = "dashed", colour = "black") +
@@ -302,7 +306,8 @@ plot_ly() |>
   layout(xaxis = list(title = "Surface area (Ha)", type = "log"),
          yaxis = list(title = "Max depth (m)", type = "log"),
          legend = list(orientation = "h", x = 0.2, y = -0.2)) |> 
-  colorbar(title = "Latitude") 
+  colorbar(title = "Latitude") |>
+  bslib::card(full_screen = TRUE)
 
 
 ```
@@ -328,8 +333,6 @@ plot_ly() |>
 ```{r}
 #| label: fig-max-depth
 #| fig.cap: "Predicted vs observed max depth. Note that the x and y axes are log10 scaled."
-#| fig.width: 3
-#| fig.height: 3
 
 comp_max_depth <- read.csv("data/comp_max_depth.csv") |> 
   dplyr::filter(source != "Hydrolakes") |> 
@@ -364,7 +367,8 @@ plot_ly() |>
             showlegend = TRUE, line = list(color = "grey")) |> 
   layout(xaxis = list(title = "Measured max depth (m)", type = "log", range = log10(lims)),
          yaxis = list(title = "Predicted max depth (m)", type = "log", range = log10(lims)),
-         legend = list(orientation = "h", x = 0.2, y = -0.2))
+         legend = list(orientation = "h", x = 0.2, y = -0.2)) |> 
+  layout(width = 600, height = 600)
 
 
 ```
