@@ -91,7 +91,7 @@ names(geomorph_cols) <- geomorph_class
 
 # Set source colours
 source_cols <- c("FENZ" = "#8DA0CB", "Hydrolakes" = "#FC8D62", 
-                 "GloBATHY" = "#A6D854", "Model" = "black")
+                 "GloBATHY" = "#A6D854", "ML model" = "black")
 sc_df <- data.frame(source = names(source_cols), col = source_cols)
 
 ```
@@ -275,15 +275,21 @@ tm_shape(nz_region_clip, name = "Region") +
 -   Used machine learning to predict lake depth from morphometric data for all lakes in New Zealand and benchmark against the FENZ dataset.
 
 
-## Lake depth-area relationship {.smaller data-name="Results" .unnumbered .unlisted}
+## Depth-area relationship {.smaller data-name="Results" .unnumbered .unlisted}
 
 ```{r}
 #| label: fig-depth-area-latitude
 #| fig-cap: Summary of measured lake area and max depth by latitude and elevation.
 
+df <- lake_summ |> 
+  dplyr::rename(Area = area_Ha, Depth = z_max, Elevation = elevation, 
+                Latitude = lat, `Geomorphic type` = GeomorphicType) |>
+  # Round all numeric to 2 digits
+  dplyr::mutate_if(is.numeric, ~round(., 2))
+
 p <- ggplot() +
-  geom_point(data = lake_summ, aes(x = area_Ha, y = z_max, color = lat,
-                                   size = elevation)) +
+  geom_point(data = df, aes(x = Area, y = Depth, color = Latitude,
+                                   size = Elevation)) +
   # scale_colour_fermenter(palette = "RdYlBu") +
   scale_color_viridis_c() +
   scale_size_binned(breaks = c(0, 250, 500, 750, 1000, 2000)) +
@@ -295,49 +301,27 @@ p <- ggplot() +
   theme_bw(base_size = 16)
 # p
 
-ggplotly(p) |> 
-  bslib::card(full_screen = TRUE)
-
-# plot_ly() |> 
-#   add_markers(data = lake_summ, x = ~area_Ha, y = ~z_max, color = ~lat,
-#               size = ~elevation, colors = c("#73D2DE", "#FFBC42", "#D81159"),
-#               hoverinfo = "text",
-#               text = paste0("Lake: ", lake_summ$name_final, "<br>",
-#                             "Area: ", round(lake_summ$area_Ha, 1), " Ha<br>",
-#                             "Max depth: ", round(lake_summ$z_max, 1), " m<br>",
-#                             "Latitude: ", round(lake_summ$lat, 1), "°<br>",
-#                             "Elevation: ", round(lake_summ$elevation, 1), " m")) |> 
-#   layout(xaxis = list(title = "Surface area (Ha)", type = "log"),
-#          yaxis = list(title = "Max depth (m)", type = "log"),
-#          legend = list(orientation = "h", x = 0.2, y = -0.2)) |> 
-#   colorbar(title = "Latitude") |>
-#   bslib::card(full_screen = TRUE)
-
+ggplotly(p, height = 500, width = 700)
 
 ```
 
-## Lake depth-area & geomorphic type relationship {.smaller .unnumbered .unlisted}
+## Depth-area x geomorphic type  {.smaller .unnumbered .unlisted}
 
 ```{r}
 #| label: fig-depth-area-gmtypew
 #| fig-cap: Summary of measured lake area and max depth by geomorphic type.
-#| fig.width: 4
-#| fig.height: 5
 
 p <- ggplot() +
-  geom_point(data = lake_summ, aes(x = area_Ha, y = z_max, color = GeomorphicType)) +
-  geom_smooth(data = lake_summ, aes(x = area_Ha, y = z_max, color = GeomorphicType),
+  geom_point(data = df, aes(x = Area, y = Depth, color = `Geomorphic type`)) +
+  geom_smooth(data = df, aes(x = Area, y = Depth, color = `Geomorphic type`),
               method = "lm", se = FALSE) +
   scale_color_manual(values = geomorph_cols) +
   scale_y_log10(breaks = c(1, 5, 10, 20, 50, 100, 400)) +
   scale_x_log10(breaks = c(1, 5, 10, 50, 100, 1000)) +
   labs(x = "Area (ha)", y = "Depth (m)", color = "Geomorphic\ntype")+
-  theme_bw(base_size = 16)
+  theme_bw(base_size = 14)
 # p
-ggplotly(p) |> 
-  bslib::card(full_screen = TRUE)
-
-
+ggplotly(p, height = 500, width = 700)
 
 ```
 
@@ -365,10 +349,27 @@ ggplotly(p) |>
 
 comp_max_depth <- read.csv("data/comp_max_depth.csv") |> 
   dplyr::filter(source != "Hydrolakes") |> 
+  dplyr::mutate(
+    source = dplyr::case_when(
+      source == "Model" ~ "ML model",
+      .default = source
+    ),
+    label = dplyr::case_when(
+      source == "ML model" ~ gsub("Model", "ML model", source),
+      .default = source
+    )
+  ) |> 
   dplyr::rename(`Measured depth` = z_max, `Predicted depth` = LERNZmp) |> 
   dplyr::left_join(id_names, by = c("id_final" = "id_final"))
 comp_mean_depth <- read.csv("data/comp_mean_depth.csv") |> 
-  dplyr::filter(source != "GloBATHY")
+  dplyr::filter(source != "GloBATHY") |> 
+    dplyr::mutate(
+    source = dplyr::case_when(
+      source == "Model" ~ "ML model",
+      .default = source
+    )
+  ) 
+
 
 cols <- comp_max_depth |> 
   dplyr::select(source, label) |> 
@@ -382,22 +383,34 @@ lims <- range(comp_max_depth$`Predicted depth`, comp_max_depth$`Measured depth`,
               na.rm = TRUE)
 brks <- c(1, 10, 100)
 
+p <- ggplot() +
+  geom_point(data = comp_max_depth, aes(x = `Measured depth`, y = `Predicted depth`, color = label)) +
+  geom_abline(intercept = 0, slope = 1, linetype = "dashed") +
+  scale_x_log10(breaks = brks) +
+  scale_y_log10(breaks = brks) +
+  scale_color_manual(values = cols_vec) +
+  labs(x = "Measured max depth (m)", y = "Predicted max depth (m)", color = "Source") +
+  coord_equal() +
+  theme_bw(base_size = 14)
+# p
+ggplotly(p, height = 500, width = 600)
 
-plot_ly() |> 
-  add_trace(data = comp_max_depth, x = ~`Measured depth`,
-            y = ~`Predicted depth`, colors = cols_vec,
-            hoverinfo = "text",
-            text = paste0("Lake: ", comp_max_depth$name_final, "<br>",
-                               "Predicted depth: ", round(comp_max_depth$`Predicted depth`, 1), "<br>",
-                               "Measured depth: ", round(comp_max_depth$`Measured depth`, 1), "<br>",
-                               "Source: ", comp_max_depth$label),
-            type = "scatter", mode = "markers", color = ~label) |> 
-  add_trace(x = lims, y = lims, type = "scatter", mode = "lines", name = "1:1 line",
-            showlegend = TRUE, line = list(color = "grey")) |> 
-  layout(xaxis = list(title = "Measured max depth (m)", type = "log", range = log10(lims)),
-         yaxis = list(title = "Predicted max depth (m)", type = "log", range = log10(lims)),
-         legend = list(orientation = "h", x = 0.2, y = -0.2)) |> 
-  layout(width = 600, height = 600)
+
+# plot_ly() |> 
+#   add_trace(data = comp_max_depth, x = ~`Measured depth`,
+#             y = ~`Predicted depth`, colors = cols_vec,
+#             hoverinfo = "text",
+#             text = paste0("Lake: ", comp_max_depth$name_final, "<br>",
+#                                "Predicted depth: ", round(comp_max_depth$`Predicted depth`, 1), "<br>",
+#                                "Measured depth: ", round(comp_max_depth$`Measured depth`, 1), "<br>",
+#                                "Source: ", comp_max_depth$label),
+#             type = "scatter", mode = "markers", color = ~label) |> 
+#   add_trace(x = lims, y = lims, type = "scatter", mode = "lines", name = "1:1 line",
+#             showlegend = TRUE, line = list(color = "grey")) |> 
+#   layout(xaxis = list(title = "Measured max depth (m)", type = "log", range = log10(lims)),
+#          yaxis = list(title = "Predicted max depth (m)", type = "log", range = log10(lims)),
+#          legend = list(orientation = "h", x = 0.2, y = -0.2)) |> 
+#   layout(width = 600, height = 600)
 
 
 ```
@@ -422,7 +435,7 @@ tbl <- comp_max_depth |>
                    pe = mean(prop_error, na.rm = TRUE),
                    n = sum(!is.na(diff))
                    ) |>
-  dplyr::mutate(source = factor(source, levels = c( "FENZ", "Hydrolakes", "GloBATHY", "Model")),
+  dplyr::mutate(source = factor(source, levels = c( "FENZ", "Hydrolakes", "GloBATHY", "ML model")),
                 variable = "Lake max depth") |>
   dplyr::select(source, n, bias, rmse, r2) |>
   # Round all numeric to 2 digits
