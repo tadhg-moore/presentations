@@ -154,33 +154,33 @@ cols <- setNames(cols_df$col, cols_df$label)
 #   layout(
 #     xaxis = list(title = "log10(Depth)"),
 #     yaxis = list(title = "Frequency"),
-    # legend = list(orientation = "h", x = 0.2, y = -0.2),
-    # barmode = "stack"#,
-    # updatemenus = list(
-    #   list(
-    #     type = "buttons",  # Using buttons to control color visibility
-    #     x = 0.1,  # Positioning of the button
-    #     y = 1.05,  # Positioning of the button
-    #     buttons = list(
-    #       list(
-    #         label = "Fill Color On",
-    #         method = "restyle",
-    #         args = list("opacity", 1)  # Set fill color on by controlling opacity
-    #       ),
-    #       list(
-    #         label = "Fill Color Off",
-    #         method = "restyle",
-    #         args = list("opacity", 0.5)  # Set fill color off by controlling opacity
-    #       )
-    #     )
-    #   )
-    # )
-  # )
+# legend = list(orientation = "h", x = 0.2, y = -0.2),
+# barmode = "stack"#,
+# updatemenus = list(
+#   list(
+#     type = "buttons",  # Using buttons to control color visibility
+#     x = 0.1,  # Positioning of the button
+#     y = 1.05,  # Positioning of the button
+#     buttons = list(
+#       list(
+#         label = "Fill Color On",
+#         method = "restyle",
+#         args = list("opacity", 1)  # Set fill color on by controlling opacity
+#       ),
+#       list(
+#         label = "Fill Color Off",
+#         method = "restyle",
+#         args = list("opacity", 0.5)  # Set fill color off by controlling opacity
+#       )
+#     )
+#   )
+# )
+# )
 
 
 
 
-  # ggplot() +
+# ggplot() +
 #   geom_point(data = df, aes(x = area_Ha, y = z_max, colour = GeomorphicType),
 #              alpha = 0.5, size = 1) +
 #   scale_y_log10(breaks = c(1, 5, 10, 20, 50, 100, 400)) +
@@ -301,7 +301,7 @@ df <- lake_summ |>
 
 p <- ggplot() +
   geom_point(data = df, aes(x = Area, y = Depth, color = Latitude,
-                                   size = Elevation)) +
+                            size = Elevation)) +
   # scale_colour_fermenter(palette = "RdYlBu") +
   scale_color_viridis_c() +
   scale_size_binned(breaks = c(0, 250, 500, 750, 1000, 2000)) +
@@ -320,7 +320,7 @@ ggplotly(p, height = 500, width = 700)
 ## Depth-area x geomorphic type  {.smaller .unnumbered .unlisted}
 
 ```{r}
-#| label: fig-depth-area-gmtypew
+#| label: fig-depth-area-gmtype
 #| fig-cap: Summary of measured lake area and max depth by geomorphic type.
 
 labs <- df |> 
@@ -363,7 +363,7 @@ ggplotly(p, height = 500, width = 700)
 #| echo: false
 
 .reveal table {
-  font-size: smaller;
+font-size: smaller;
 }
 
 ```
@@ -386,14 +386,6 @@ comp_max_depth <- read.csv("data/comp_max_depth.csv") |>
   ) |> 
   dplyr::rename(`Measured depth` = z_max, `Predicted depth` = LERNZmp) |> 
   dplyr::left_join(id_names, by = c("id_final" = "id_final"))
-comp_mean_depth <- read.csv("data/comp_mean_depth.csv") |> 
-  dplyr::filter(source != "GloBATHY") |> 
-    dplyr::mutate(
-    source = dplyr::case_when(
-      source == "Model" ~ "ML model",
-      .default = source
-    )
-  ) 
 
 
 cols <- comp_max_depth |> 
@@ -420,24 +412,6 @@ p <- ggplot() +
 # p
 ggplotly(p, height = 500, width = 600)
 
-
-# plot_ly() |> 
-#   add_trace(data = comp_max_depth, x = ~`Measured depth`,
-#             y = ~`Predicted depth`, colors = cols_vec,
-#             hoverinfo = "text",
-#             text = paste0("Lake: ", comp_max_depth$name_final, "<br>",
-#                                "Predicted depth: ", round(comp_max_depth$`Predicted depth`, 1), "<br>",
-#                                "Measured depth: ", round(comp_max_depth$`Measured depth`, 1), "<br>",
-#                                "Source: ", comp_max_depth$label),
-#             type = "scatter", mode = "markers", color = ~label) |> 
-#   add_trace(x = lims, y = lims, type = "scatter", mode = "lines", name = "1:1 line",
-#             showlegend = TRUE, line = list(color = "grey")) |> 
-#   layout(xaxis = list(title = "Measured max depth (m)", type = "log", range = log10(lims)),
-#          yaxis = list(title = "Predicted max depth (m)", type = "log", range = log10(lims)),
-#          legend = list(orientation = "h", x = 0.2, y = -0.2)) |> 
-#   layout(width = 600, height = 600)
-
-
 ```
 
 :::
@@ -459,7 +433,7 @@ tbl <- comp_max_depth |>
                    r2 = ifelse(all(is.na(diff)), NA, cor(LERNZmp, z_max, use = "complete.obs")^2),
                    pe = mean(prop_error, na.rm = TRUE),
                    n = sum(!is.na(diff))
-                   ) |>
+  ) |>
   dplyr::mutate(source = factor(source, levels = c( "FENZ", "Hydrolakes", "GloBATHY", "ML model")),
                 variable = "Lake max depth") |>
   dplyr::select(source, n, bias, rmse, r2) |>
@@ -468,7 +442,7 @@ tbl <- comp_max_depth |>
   dplyr::rename(R2 = r2, RMSE = rmse, Bias = bias, N = n, Source = source)
 
 max_depth_r2 <- tbl |> 
-  dplyr::filter(Source == "Model") |> 
+  dplyr::filter(Source == "ML model") |> 
   dplyr::pull(R2)
 
 fenz_max_depth_r2 <- tbl |> 
@@ -490,11 +464,19 @@ tbl |>
 ```{r}
 #| label: fig-mean-depth
 #| fig.cap: "Predicted vs observed mean depth. Note that the x and y axes are log10 scaled."
-#| fig.width: 4
-#| fig.height: 4
 
 comp_mean_depth <- read.csv("data/comp_mean_depth.csv") |> 
   dplyr::filter(source != "GloBATHY", !is.na(LERNZmp)) |> 
+  dplyr::mutate(
+    source = dplyr::case_when(
+      source == "Model" ~ "ML model",
+      .default = source
+    ),
+    label = dplyr::case_when(
+      source == "ML model" ~ gsub("Model", "ML model", source),
+      .default = source
+    )
+  ) |> 
   dplyr::rename(`Measured depth` = z_mean, `Predicted depth` = LERNZmp) |> 
   dplyr::left_join(id_names, by = c("id_final" = "id_final"))
 
@@ -510,21 +492,33 @@ lims <- range(comp_mean_depth$`Predicted depth`, comp_mean_depth$`Measured depth
               na.rm = TRUE)
 brks <- c(1, 10, 100)
 
+p <- ggplot() +
+  geom_point(data = comp_mean_depth, aes(x = `Measured depth`, y = `Predicted depth`, color = label)) +
+  geom_abline(intercept = 0, slope = 1, linetype = "dashed") +
+  scale_x_log10(breaks = brks) +
+  scale_y_log10(breaks = brks) +
+  scale_color_manual(values = cols_vec) +
+  labs(x = "Measured mean depth (m)", y = "Predicted mean depth (m)", color = "Source") +
+  coord_equal() +
+  theme_bw(base_size = 14)
+p
+ggplotly(p, height = 500, width = 600)
 
-plot_ly() |> 
-  add_trace(data = comp_mean_depth, x = ~`Measured depth`,
-            y = ~`Predicted depth`, colors = cols_vec,
-            hoverinfo = "text",
-            text = paste0("Lake: ", comp_mean_depth$name_final, "<br>",
-                               "Predicted depth: ", round(comp_mean_depth$`Predicted depth`, 1), "<br>",
-                               "Measured depth: ", round(comp_mean_depth$`Measured depth`, 1), "<br>",
-                               "Source: ", comp_mean_depth$label),
-            type = "scatter", mode = "markers", color = ~label) |> 
-  add_trace(x = lims, y = lims, type = "scatter", mode = "lines", name = "1:1 line",
-            showlegend = TRUE, line = list(color = "grey")) |> 
-  layout(xaxis = list(title = "Measured mean depth (m)", type = "log", range = log10(lims)),
-         yaxis = list(title = "Predicted mean depth (m)", type = "log", range = log10(lims)),
-         legend = list(orientation = "h", x = 0.2, y = -0.2))
+
+# plot_ly() |> 
+#   add_trace(data = comp_mean_depth, x = ~`Measured depth`,
+#             y = ~`Predicted depth`, colors = cols_vec,
+#             hoverinfo = "text",
+#             text = paste0("Lake: ", comp_mean_depth$name_final, "<br>",
+#                           "Predicted depth: ", round(comp_mean_depth$`Predicted depth`, 1), "<br>",
+#                           "Measured depth: ", round(comp_mean_depth$`Measured depth`, 1), "<br>",
+#                           "Source: ", comp_mean_depth$label),
+#             type = "scatter", mode = "markers", color = ~label) |> 
+#   add_trace(x = lims, y = lims, type = "scatter", mode = "lines", name = "1:1 line",
+#             showlegend = TRUE, line = list(color = "grey")) |> 
+#   layout(xaxis = list(title = "Measured mean depth (m)", type = "log", range = log10(lims)),
+#          yaxis = list(title = "Predicted mean depth (m)", type = "log", range = log10(lims)),
+#          legend = list(orientation = "h", x = 0.2, y = -0.2))
 
 
 ```
@@ -548,8 +542,8 @@ tbl <- comp_mean_depth |>
                    r2 = ifelse(all(is.na(diff)), NA, cor(LERNZmp, z_mean, use = "complete.obs")^2),
                    pe = mean(prop_error, na.rm = TRUE),
                    n = sum(!is.na(diff))
-                   ) |>
-  dplyr::mutate(source = factor(source, levels = c( "FENZ", "Hydrolakes", "GloBATHY", "Model")),
+  ) |>
+  dplyr::mutate(source = factor(source, levels = c( "FENZ", "Hydrolakes", "GloBATHY", "ML model")),
                 variable = "Lake mean depth") |>
   dplyr::select(source, n, bias, rmse, r2) |>
   # Round all numeric to 2 digits
@@ -557,7 +551,7 @@ tbl <- comp_mean_depth |>
   dplyr::rename(R2 = r2, RMSE = rmse, Bias = bias, N = n, Source = source)
 
 mean_depth_r2 <- tbl |> 
-  dplyr::filter(Source == "Model") |> 
+  dplyr::filter(Source == "ML model") |> 
   dplyr::pull(R2)
 
 fenz_mean_depth_r2 <- tbl |> 
@@ -579,6 +573,56 @@ Development of Volume, $D_V$ (Hutchinson 1957) is a measure of departure of the 
 $$D_V = \frac{3 \times \bar{Z}}{Z_{max}}$$
 
 For the majority of lakes, DV \>1 (i.e. a conical depression). DV is greatest in shallow lakes with flat bottoms.
+
+## {.unnumbered .unlisted}
+
+```{r}
+#| label: fig-dv-ridges
+#| fig.cap: "Distribution of volume development (DV) by geomorphic type."
+#| fig.width: 6
+
+library(ggridges)
+lab <- lake_summ |> 
+  dplyr::filter(!is.na(DV)) |>
+  dplyr::group_by(GeomorphicType) |>
+  dplyr::summarise(n = dplyr::n(), mean_dv = mean(DV)) |>
+  dplyr::mutate(label = paste0(GeomorphicType, " (n=", n, ")")) |> 
+  dplyr::arrange(dplyr::desc(mean_dv))
+
+df <- lake_summ |> 
+  dplyr::left_join(lab, by = "GeomorphicType") |> 
+  dplyr::filter(n > 1) |>
+  dplyr::arrange(mean_dv) |> 
+  dplyr::mutate(label = factor(label, levels = lab$label))
+
+cols_df <- data.frame(name = names(geomorph_cols), col = geomorph_cols) |> 
+  dplyr::left_join(lab, by = c("name" = "GeomorphicType")) |> 
+  dplyr::filter(!is.na(n))
+cols <- setNames(cols_df$col, cols_df$label)
+
+
+p <- ggplot() +
+  stat_density_ridges(data = df, aes(x = DV, y = label, fill = label), 
+                      alpha = 0.5, quantile_lines = TRUE, quantiles = c(0.25, 0.5, 0.75), 
+                      jittered_points = TRUE, point_shape = '|', alpha = 0.7, point_size = 3,
+                      position = position_points_jitter(width = 0.02, height = 0)) +
+  geom_density_ridges(data = df, aes(x = DV, y = label, fill = label), 
+                      alpha = 0.5, quantile_lines = TRUE, 
+                      quantiles = c(0.25, 0.5, 0.75), jittered_points = TRUE, 
+                      point_shape = '|', alpha = 0.7, point_size = 3,
+                      position = position_points_jitter(width = 0.02, height = 0)) +
+  geom_vline(xintercept = 1.5, linetype = "dashed") +
+  labs(x = "Volume development (DV)", y = "Density") +
+  scale_x_continuous(limits = c(0, 3), breaks = seq(0, 3, 0.5)) +
+  scale_fill_manual(values = cols) +
+  # scale_colour_manual(values = gm_cols) +
+  guides(fill = "none") +
+  theme_bw(base_size = 14)
+# ggplotly(p, height = 500, width = 700)
+p
+
+```
+
 
 ## Machine learning {.r-fit-text .unnumbered .unlisted}
 
