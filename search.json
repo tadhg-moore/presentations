@@ -1,12 +1,5 @@
 [
   {
-    "objectID": "nzfss/nzfss_bathymetry_2024.html#overview",
-    "href": "nzfss/nzfss_bathymetry_2024.html#overview",
-    "title": "Morphometric distribution of depth and basin shape in Aotearoa New Zealand lakes",
-    "section": "Overview",
-    "text": "Overview\n\n(Background)[#Background]\nMethods\nResults\nConclusions\nFuture Work"
-  },
-  {
     "objectID": "nzfss/nzfss_bathymetry_2024.html#motivation",
     "href": "nzfss/nzfss_bathymetry_2024.html#motivation",
     "title": "Morphometric distribution of depth and basin shape in Aotearoa New Zealand lakes",
@@ -21,11 +14,11 @@
     "text": "Objectives\n\nDevelop a comprehensive database of lake depth and morphometry for New Zealand.\nUse machine learning to predict mean and maximum lake depth from this data.\nCompare these predictions to the FENZ database and other global lake depth databases e.g. maximum lake depths - GLOBathy(Khazaei et al. 2022) and mean lake depth - HydroLAKES (Messager et al. 2016)"
   },
   {
-    "objectID": "nzfss/nzfss_bathymetry_2024.html#background",
-    "href": "nzfss/nzfss_bathymetry_2024.html#background",
+    "objectID": "nzfss/nzfss_bathymetry_2024.html#section",
+    "href": "nzfss/nzfss_bathymetry_2024.html#section",
     "title": "Morphometric distribution of depth and basin shape in Aotearoa New Zealand lakes",
-    "section": "Background",
-    "text": "Background\n\n\n\nLack of a central database on lake morphometry, particularly depth\nLarge number of bathymetric data has been recorded across lakes in New Zealand\nCurrent predictions of max lake depth, within the FENZ database (n=3475) are limited and have clear biases\n\n\n\n\n\n\n\n\n\n\nFigure 1: Depth distribution of FENZ lakes by geomorphic type"
+    "section": "",
+    "text": "Lack of a central database on lake morphometry, particularly depth\nLarge number of bathymetric data has been recorded across lakes in New Zealand\nCurrent predictions of max lake depth, within the FENZ database (n=3475) are limited and have clear biases\n\n\n\n\n\n\n\n\n\n\nFigure 1: Depth distribution of FENZ lakes. The x-axis is log10 scaled."
   },
   {
     "objectID": "nzfss/nzfss_bathymetry_2024.html#max-depth-vs-lake-area",
