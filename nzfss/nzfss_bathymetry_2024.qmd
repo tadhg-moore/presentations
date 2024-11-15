@@ -80,6 +80,7 @@ lake_summ <- read.csv("data/lake_bathy_summary.csv") |>
 
 library(ggplot2)
 library(plotly)
+library(bathytools)
 
 
 # Set geomorphology colours
@@ -93,6 +94,12 @@ names(geomorph_cols) <- geomorph_class
 source_cols <- c("FENZ" = "#8DA0CB", "Hydrolakes" = "#FC8D62", 
                  "GloBATHY" = "#A6D854", "ML model" = "black")
 sc_df <- data.frame(source = names(source_cols), col = source_cols)
+
+library(tmap)
+# bmap <- paste0("https://basemaps.linz.govt.nz/v1/tiles/aerial/WebMercatorQuad/{z}/{x}/{y}.webp?api=", 
+#                Sys.getenv("LINZ_BASEMAP_KEY"))
+# tmap_options(basemaps = "https://basemaps.linz.govt.nz/v1/tiles/aerial/WebMercatorQuad/{z}/{x}/{y}.webp?api=c01hsah0ttthgq51dgrqbw9r2bd", check.and.fix = TRUE)
+
 
 ```
 
@@ -230,6 +237,85 @@ ggplot() +
 
 ```
 
+## Bathymetry example: Lake Rotoma {.smaller .unnumbered .unlisted}
+
+Depth contours
+
+```{r}
+#| label: fig-rotoma-contours
+#| fig.cap: "Depth contours of Lake Rotoma, a large lake in the Bay of Plenty region."
+
+cont <- readRDS("data/bathy_contours/LID40102_rotoma.rds") 
+shoreline <- lyr |> 
+  dplyr::filter(id_final == "LID 40102") 
+brks <- seq(min(cont$depth, na.rm = TRUE), 0, length.out = 5)
+
+
+tmap_mode("view")
+tm_shape(cont, name = "Depth contours") +
+  tm_lines(col = "depth", palette = "Blues", lwd = 1, style = "cont",
+           breaks = brks, title.col = "Depth (m)") +
+  tm_shape(shoreline, name = "Shoreline") +
+  tm_borders(col = "black", lwd = 2) 
+
+
+```
+
+## Bathymetry example: Lake Rotoma {.smaller .unnumbered .unlisted}
+
+Bathymetry raster
+
+```{r}
+#| label: fig-rotoma-raster
+#| fig.cap: "Depth raster of Lake Rotoma, a large lake in the Bay of Plenty region."
+
+bathy <- bathytools::rasterise_bathy(shoreline = shoreline, contours = cont, 
+                                     res = 12, crs = 2193, print_plot = FALSE)
+
+tm_shape(bathy) +
+  tm_raster(palette = "Blues", title = "Depth (m)", breaks = brks, 
+            style = "cont") +
+  tm_shape(shoreline, name = "Shoreline") +
+  tm_borders(col = "black", lwd = 2) 
+
+
+```
+
+## Bathymetry example: Lake Rotoma {.smaller .unnumbered .unlisted}
+
+Estimated hypsographic curve
+
+```{r}
+#| label: fig-rotoma-bathymetry-3d
+#| fig.cap: "Three dimensional rendering of Lake Rotoma's bathymetry."
+
+bathytools::plot_raster_3d(x = bathy, cols = "bathy", shoreline = shoreline)
+
+```
+
+## Bathymetry example: Lake Rotoma {.smaller .unnumbered .unlisted}
+
+Estimated hypsographic curve
+
+```{r}
+#| label: fig-rotoma-hypsograph
+#| fig.cap: "Depth raster of Lake Rotoma, a large lake in the Bay of Plenty region."
+#| fig.width: 6
+#| fig.height: 4
+
+hyps <- bathy_to_hypso(bathy_raster = bathy)
+
+p <- ggplot() +
+  geom_point(data = hyps, aes(y = depth, x = area)) +
+  geom_line(data = hyps, aes(y = depth, x = area)) +
+  labs(y = "Depth (m)", x = bquote("Area"~(m^2))) +
+  theme_bw(base_size = 16)
+p
+# ggplotly(p, height = 500, width = 500)
+
+```
+
+
 ## Lakes with bathymetry data {.smaller .unnumbered .unlisted}
 
 ::::: columns
@@ -244,10 +330,7 @@ ggplot() +
 #| fig.cap: "Map of lakes with bathymetric data and maximum depth data in New Zealand. Lakes with bathymetry data have a black marker."
 #| fig.width: 3.75
 #| fig.height: 5
-library(tmap)
-bmap <- paste0("https://basemaps.linz.govt.nz/v1/tiles/aerial/WebMercatorQuad/{z}/{x}/{y}.webp?api=", 
-               Sys.getenv("LINZ_BASEMAP_KEY"))
-tmap_options(basemaps = "https://basemaps.linz.govt.nz/v1/tiles/aerial/WebMercatorQuad/{z}/{x}/{y}.webp?api=c01hsah0ttthgq51dgrqbw9r2bd", check.and.fix = TRUE)
+
 nz_region_clip <- readRDS("data/nz_region_clip.rds")
 # tmap_mode("view")
 # tm_shape(nz_region_clip, name = "Region") +
@@ -350,6 +433,62 @@ ggplotly(p, height = 500, width = 700)
 
 ```
 
+## Distribution of volume development
+
+Development of Volume, $D_V$ (Hutchinson 1957) is a measure of departure of the shape of the lake basin from that of a cone calculated using the maximum depth $Z_{max}$ and the average depth $\bar{Z}$ :
+
+$$D_V = \frac{3 \times \bar{Z}}{Z_{max}}$$
+
+For the majority of lakes, DV \>1 (i.e. a conical depression). DV is greatest in shallow lakes with flat bottoms.
+
+## {.unnumbered .unlisted}
+
+```{r}
+#| label: fig-dv-ridges
+#| fig.cap: "Distribution of volume development (DV) by geomorphic type."
+#| fig.width: 6
+
+library(ggridges)
+lab <- lake_summ |> 
+  dplyr::filter(!is.na(DV)) |>
+  dplyr::group_by(GeomorphicType) |>
+  dplyr::summarise(n = dplyr::n(), mean_dv = mean(DV)) |>
+  dplyr::mutate(label = paste0(GeomorphicType, " (n=", n, ")")) |> 
+  dplyr::arrange(dplyr::desc(mean_dv))
+
+df <- lake_summ |> 
+  dplyr::left_join(lab, by = "GeomorphicType") |> 
+  dplyr::filter(n > 1) |>
+  dplyr::arrange(mean_dv) |> 
+  dplyr::mutate(label = factor(label, levels = lab$label))
+
+cols_df <- data.frame(name = names(geomorph_cols), col = geomorph_cols) |> 
+  dplyr::left_join(lab, by = c("name" = "GeomorphicType")) |> 
+  dplyr::filter(!is.na(n))
+cols <- setNames(cols_df$col, cols_df$label)
+
+
+p <- ggplot() +
+  stat_density_ridges(data = df, aes(x = DV, y = label, fill = label), 
+                      alpha = 0.5, quantile_lines = TRUE, quantiles = c(0.25, 0.5, 0.75), 
+                      jittered_points = TRUE, point_shape = '|', alpha = 0.7, point_size = 3,
+                      position = position_points_jitter(width = 0.02, height = 0)) +
+  geom_density_ridges(data = df, aes(x = DV, y = label, fill = label), 
+                      alpha = 0.5, quantile_lines = TRUE, 
+                      quantiles = c(0.25, 0.5, 0.75), jittered_points = TRUE, 
+                      point_shape = '|', alpha = 0.7, point_size = 3,
+                      position = position_points_jitter(width = 0.02, height = 0)) +
+  geom_vline(xintercept = 1.5, linetype = "dashed") +
+  labs(x = "Volume development (DV)", y = "Density") +
+  scale_x_continuous(limits = c(0, 3), breaks = seq(0, 3, 0.5)) +
+  scale_fill_manual(values = cols) +
+  # scale_colour_manual(values = gm_cols) +
+  guides(fill = "none") +
+  theme_bw(base_size = 14)
+# ggplotly(p, height = 500, width = 700)
+p
+
+```
 
 ## Predicting mean and max depth {.smaller .unnumbered .unlisted}
 
@@ -565,63 +704,6 @@ tbl |>
 :::
 :::::
 ::::::
-
-## Distribution of volume development
-
-Development of Volume, $D_V$ (Hutchinson 1957) is a measure of departure of the shape of the lake basin from that of a cone calculated using the maximum depth $Z_{max}$ and the average depth $\bar{Z}$ :
-
-$$D_V = \frac{3 \times \bar{Z}}{Z_{max}}$$
-
-For the majority of lakes, DV \>1 (i.e. a conical depression). DV is greatest in shallow lakes with flat bottoms.
-
-## {.unnumbered .unlisted}
-
-```{r}
-#| label: fig-dv-ridges
-#| fig.cap: "Distribution of volume development (DV) by geomorphic type."
-#| fig.width: 6
-
-library(ggridges)
-lab <- lake_summ |> 
-  dplyr::filter(!is.na(DV)) |>
-  dplyr::group_by(GeomorphicType) |>
-  dplyr::summarise(n = dplyr::n(), mean_dv = mean(DV)) |>
-  dplyr::mutate(label = paste0(GeomorphicType, " (n=", n, ")")) |> 
-  dplyr::arrange(dplyr::desc(mean_dv))
-
-df <- lake_summ |> 
-  dplyr::left_join(lab, by = "GeomorphicType") |> 
-  dplyr::filter(n > 1) |>
-  dplyr::arrange(mean_dv) |> 
-  dplyr::mutate(label = factor(label, levels = lab$label))
-
-cols_df <- data.frame(name = names(geomorph_cols), col = geomorph_cols) |> 
-  dplyr::left_join(lab, by = c("name" = "GeomorphicType")) |> 
-  dplyr::filter(!is.na(n))
-cols <- setNames(cols_df$col, cols_df$label)
-
-
-p <- ggplot() +
-  stat_density_ridges(data = df, aes(x = DV, y = label, fill = label), 
-                      alpha = 0.5, quantile_lines = TRUE, quantiles = c(0.25, 0.5, 0.75), 
-                      jittered_points = TRUE, point_shape = '|', alpha = 0.7, point_size = 3,
-                      position = position_points_jitter(width = 0.02, height = 0)) +
-  geom_density_ridges(data = df, aes(x = DV, y = label, fill = label), 
-                      alpha = 0.5, quantile_lines = TRUE, 
-                      quantiles = c(0.25, 0.5, 0.75), jittered_points = TRUE, 
-                      point_shape = '|', alpha = 0.7, point_size = 3,
-                      position = position_points_jitter(width = 0.02, height = 0)) +
-  geom_vline(xintercept = 1.5, linetype = "dashed") +
-  labs(x = "Volume development (DV)", y = "Density") +
-  scale_x_continuous(limits = c(0, 3), breaks = seq(0, 3, 0.5)) +
-  scale_fill_manual(values = cols) +
-  # scale_colour_manual(values = gm_cols) +
-  guides(fill = "none") +
-  theme_bw(base_size = 14)
-# ggplotly(p, height = 500, width = 700)
-p
-
-```
 
 
 ## Machine learning {.r-fit-text .unnumbered .unlisted}
