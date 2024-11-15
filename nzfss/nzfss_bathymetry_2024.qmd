@@ -113,14 +113,16 @@ sc_df <- data.frame(source = names(source_cols), col = source_cols)
 
 ## {.smaller}
 
+FENZ Lakes
+
 ::::: columns
-::: {.column width="50%"}
+::: {.column width="40%"}
 -   Lack of a central database on lake morphometry, particularly depth
 -   Large number of bathymetric data has been recorded across lakes in New Zealand
 -   Current predictions of max lake depth, within the FENZ database (n=`r n_fenz`) are limited and have clear biases
 :::
 
-::: {.column width="50%"}
+::: {.column width="60%"}
 ```{r}
 #| label: fig-fenz-depth-distribution
 #| fig.cap: "Depth distribution of FENZ lakes. The x-axis is log10 scaled."
@@ -135,18 +137,25 @@ labs <- fenz_depths |>
 
 df <- fenz_depths |> 
   sf::st_drop_geometry() |> 
-  dplyr::left_join(labs, by = "GeomorphicType")
+  dplyr::left_join(labs, by = "GeomorphicType") |> 
+  dplyr::rename(Depth = z_max) |> 
+  dplyr::mutate(Depth = round(Depth, 1))
 
+cols_df <- data.frame(name = names(geomorph_cols), col = geomorph_cols) |> 
+  dplyr::left_join(labs, by = c("name" = "GeomorphicType")) |> 
+  dplyr::filter(!is.na(n))
 
-plot_ly() |>
-  add_histogram(data = df, x = ~log10(z_max), color = ~GeomorphicType,
-                colors = geomorph_cols, opacity = 1,
-                marker = list(line = list(color = "black", width = 1))) |>
-  layout(
-    xaxis = list(title = "log10(Depth)"),
-    yaxis = list(title = "Frequency"),
+cols <- setNames(cols_df$col, cols_df$label)
+
+# plot_ly() |>
+#   add_histogram(data = df, x = ~log10(z_max), color = ~GeomorphicType,
+#                 colors = geomorph_cols, opacity = 1,
+#                 marker = list(line = list(color = "black", width = 1))) |>
+#   layout(
+#     xaxis = list(title = "log10(Depth)"),
+#     yaxis = list(title = "Frequency"),
     # legend = list(orientation = "h", x = 0.2, y = -0.2),
-    barmode = "stack"#,
+    # barmode = "stack"#,
     # updatemenus = list(
     #   list(
     #     type = "buttons",  # Using buttons to control color visibility
@@ -166,7 +175,7 @@ plot_ly() |>
     #     )
     #   )
     # )
-  )
+  # )
 
 
 
@@ -179,13 +188,16 @@ plot_ly() |>
 #   labs(x = "Area (ha)", y = "Depth (m)")+
 #   theme_bw(base_size = 16)
 
-  # ggplot() +
-#   geom_histogram(data = df, aes(x = z_max),
-#                  bins = 30, colour = "white") +
-#   facet_wrap(~label, scales = "free_y") +
-#   scale_x_log10(breaks = c(1, 5, 10, 50, 100, 400)) +
-#   labs(y = "Count", x = "Depth (m)")+
-#   theme_bw(base_size = 14) 
+p <- ggplot() +
+  geom_histogram(data = df, aes(x = Depth, fill = label),
+                 bins = 30, colour = "white") +
+  scale_x_log10(breaks = c(1, 5, 10, 50, 100, 400)) +
+  scale_fill_manual(values = cols) +
+  labs(y = "Count", x = "Depth (m)", fill = "Geomorphic\ntype")+
+  theme_bw(base_size = 14)
+
+ggplotly(p, height = 500, width = 500)
+
 
 # library(plotly)
 # plot_ly() |> 
@@ -311,11 +323,24 @@ ggplotly(p, height = 500, width = 700)
 #| label: fig-depth-area-gmtypew
 #| fig-cap: Summary of measured lake area and max depth by geomorphic type.
 
+labs <- df |> 
+  dplyr::group_by(`Geomorphic type`) |>
+  dplyr::summarise(n = dplyr::n()) |>
+  dplyr::mutate(Type = paste0(`Geomorphic type`, " (n=", n, ")"))
+
+cols_df <- data.frame(name = names(geomorph_cols), col = geomorph_cols) |> 
+  dplyr::left_join(labs, by = c("name" = "Geomorphic type")) |> 
+  dplyr::filter(!is.na(n))
+cols <- setNames(cols_df$col, cols_df$Type)
+
+df <- df |> 
+  dplyr::left_join(labs, by = "Geomorphic type")
+
 p <- ggplot() +
-  geom_point(data = df, aes(x = Area, y = Depth, color = `Geomorphic type`)) +
-  geom_smooth(data = df, aes(x = Area, y = Depth, color = `Geomorphic type`),
+  geom_point(data = df, aes(x = Area, y = Depth, color = Type)) +
+  geom_smooth(data = df, aes(x = Area, y = Depth, color = Type),
               method = "lm", se = FALSE) +
-  scale_color_manual(values = geomorph_cols) +
+  scale_color_manual(values = cols) +
   scale_y_log10(breaks = c(1, 5, 10, 20, 50, 100, 400)) +
   scale_x_log10(breaks = c(1, 5, 10, 50, 100, 1000)) +
   labs(x = "Area (ha)", y = "Depth (m)", color = "Geomorphic\ntype")+
