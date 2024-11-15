@@ -78,6 +78,9 @@ gm_type <- lyr |>
 lake_summ <- read.csv("data/lake_bathy_summary.csv") |> 
   dplyr::left_join(gm_type, by = c("id_final" = "id_final"))
 
+n_bathy <- sum(!is.na(lake_summ$z_mean))
+n_depths <- sum(!is.na(lake_summ$z_max))
+
 library(ggplot2)
 library(plotly)
 library(bathytools)
@@ -105,8 +108,6 @@ source("R/summarise_hyps.R")
 
 ```
 
-
-
 ## Motivation {.smaller data-name="Background"}
 
 -   Developing the Lake Ecosystem Research New Zealand modelling platfom (LERNZmp). ![](www/lernzmp_logo.png){width="105"}
@@ -120,7 +121,7 @@ source("R/summarise_hyps.R")
 -   Use machine learning to predict mean and maximum lake depth from this data.
 -   Compare these predictions to the FENZ database and other global lake depth databases e.g. maximum lake depths - GLOBathy[@khazaei2022] and mean lake depth - HydroLAKES [@messager2016]
 
-## {.smaller}
+##  {.smaller}
 
 FENZ Lakes
 
@@ -199,7 +200,7 @@ cols <- setNames(cols_df$col, cols_df$label)
 
 p <- ggplot() +
   geom_histogram(data = df, aes(x = Depth, fill = label),
-                 bins = 30, colour = "white") +
+                 bins = 30) +
   scale_x_log10(breaks = c(1, 5, 10, 50, 100, 400)) +
   scale_fill_manual(values = cols) +
   labs(y = "Count", x = "Depth (m)", fill = "Geomorphic type") +
@@ -215,7 +216,7 @@ l <- list(
     size = 12,
     color = "#000"),
   x = 0.7, y = 0.95,
-  bgcolor = "#E2E2E2",
+  bgcolor = "#FFFFFF",
   bordercolor = "#FFFFFF",
   borderwidth = 2)
 
@@ -236,12 +237,29 @@ ggplotly(p, height = 500, width = 600) |>
 #        yaxis = list(type = "log", title = "Depth (m)"))
 
 ```
-
 :::
 :::::
 
+## Methods {.smaller data-name="Methods"}
 
-## Bathymetry example: Lake Rotoma {.smaller .unnumbered .unlisted}
+::: fragment
+-   Bathymetry survey data were sourced from a variety of sources - paper maps, digital files, and online databases (n=`r n_bathy`).
+:::
+
+::: fragment
+-   Lake maximum depth data which were known, but did not have bathymetry data available were added to the dataset (n=`r n_depths - n_bathy`) bringing us to a total `r n_depths` lakes with maximum depth data.
+:::
+
+::: fragment
+-   Shoreline data were updated using satellite and aerial imagery.
+:::
+
+-   Depth data were interpolated using a Multilevel B-Spline Approximation (MBA) algorithm. ::: {.fragment}
+-   Hypsographic curves were calculated for each lake. :::
+-   Comparison of depth and area with other databases. ::: {.fragment}
+-   Used machine learning to predict lake depth from morphometric data for all lakes in New Zealand and benchmark against the FENZ dataset. :::
+
+## Bathymetry example: Lake Rotoma {.smaller .unnumbered .unlisted transition="fade"}
 
 Depth contours
 
@@ -285,7 +303,7 @@ tm_shape(bathy) +
 
 ```
 
-## Bathymetry example: Lake Rotoma {.smaller .unnumbered .unlisted transition="fade"}
+## Bathymetry example: Lake Rotoma {.smaller .unnumbered .unlisted .center transition="fade"}
 
 Estimated hypsographic curve
 
@@ -293,14 +311,14 @@ Estimated hypsographic curve
 #| label: fig-rotoma-bathymetry-3d
 #| fig.cap: "Three dimensional rendering of Lake Rotoma's bathymetry."
 
-bathytools::plot_raster_3d(x = bathy, cols = "bathy", shoreline = shoreline) |> layout(height = 500, width = 700)
+bathytools::plot_raster_3d(x = bathy, cols = "bathy", shoreline = shoreline) |> layout(height = 450, width = 700)
 
 ```
 
 ## Bathymetry example: Lake Rotoma {.smaller .unnumbered .unlisted transition="fade"}
 
 ::::: columns
-::: {.column width="50%" .fragment}
+::: {.column width="50%"}
 Estimated hypsographic curve
 
 ```{r}
@@ -330,9 +348,9 @@ summ <- summarise_hyps(hyps = hyps, shoreline = shoreline) |>
   dplyr::rename(`Max depth` = Z_max, `Mean depth` = Z_mean, `Shoreline development index` = sdi, `Volume development index` = DV, `Shoreline length (km)` = shore_length, `Area (ha)` = area_Ha) 
 
 ```
-
 :::
-::: {.column width="50%" .fragment}
+
+::: {.column .fragment width="50%"}
 Hypsographic summary
 
 ```{r}
@@ -345,7 +363,6 @@ summ |>
   knitr::kable(caption = "Hypsographic summary of Lake Rotoma") 
 
 ```
-
 :::
 :::::
 
@@ -356,8 +373,8 @@ summ |>
 -   Lakes with bathymetric data are relatively evenly distributed across New Zealand.
 -   Lake geomorphic type is highly regionalised.
 :::
-::: {.column width="50%"}
 
+::: {.column width="50%"}
 ```{r}
 #| label: fig-fenz-map
 #| fig.cap: "Map of lakes with bathymetric data and maximum depth data in New Zealand. Lakes with bathymetry data have a black marker."
@@ -389,25 +406,14 @@ tm_shape(nz_region_clip, name = "Region") +
   tm_scale_bar(text.size = 0.6, position = c("right", "bottom")) 
 
 ```
-
 :::
 :::::
 
-## Methods {.smaller data-name="Methods"}
-
--   Bathymetry survey data were sourced from a variety of sources - paper maps, digital files, and online databases (n=.
--   Shoreline data were updated using satellite and aerial imagery.
--   Depth data were interpolated using a Multilevel B-Spline Approximation (MBA) algorithm.
--   Hypsographic curves were calculated for each lake.
--   Comparison of depth and area with other databases.
--   Used machine learning to predict lake depth from morphometric data for all lakes in New Zealand and benchmark against the FENZ dataset.
-
-
-## Depth-area relationship {.smaller data-name="Results" .unnumbered .unlisted}
+## Depth-area relationship {.smaller .unnumbered .unlisted data-name="Results"}
 
 ```{r}
 #| label: fig-depth-area-latitude
-#| fig-cap: Summary of measured lake area and max depth by latitude and elevation.
+#| fig-cap: Summary of measured lake area and max depth by latitude and elevation. The size of the point represents the elevation of the lake.
 
 df <- lake_summ |> 
   dplyr::rename(Area = area_Ha, Depth = z_max, Elevation = elevation, 
@@ -433,7 +439,7 @@ ggplotly(p, height = 500, width = 700)
 
 ```
 
-## Depth-area x geomorphic type  {.smaller .unnumbered .unlisted}
+## Breakdown by geomorphic type {.smaller .unnumbered .unlisted}
 
 ```{r}
 #| label: fig-depth-area-gmtype
@@ -470,11 +476,9 @@ ggplotly(p, height = 500, width = 700)
 
 Development of Volume, $D_V$ (Hutchinson 1957) is a measure of departure of the shape of the lake basin from that of a cone calculated using the maximum depth $Z_{max}$ and the average depth $\bar{Z}$ :
 
-$$D_V = \frac{3 \times \bar{Z}}{Z_{max}}$$
+$$D_V = \frac{3 \times \bar{Z}}{Z_{max}}$$ $D_V$ is greatest in shallow lakes with flat bottoms and low in deep lakes with steep sides.
 
-For the majority of lakes, DV \>1 (i.e. a conical depression). DV is greatest in shallow lakes with flat bottoms.
-
-## {.unnumbered .unlisted}
+##  {.unnumbered .unlisted}
 
 ```{r}
 #| label: fig-dv-ridges
@@ -525,12 +529,16 @@ p
 
 ## Predicting mean and max depth {.smaller .unnumbered .unlisted}
 
-:::::: panel-tabset
+::::::::: panel-tabset
+### Methods
+
+-   Used a random forest machine learning model from the [caret](https://topepo.github.io/caret/index.html) R package to predict mean and maximum lake depth from morphometric data [@kuhn2008].
+-   Covariates included variables available for all lakse in the dataset: lake area, elevation, latitude, shoreline development index, geomorphic type and other climate and catchment characteristics.
+
 ### Max depth
 
 ::::: columns
 ::: {.column width="60%"}
-
 ```{css}
 #| echo: false
 
@@ -585,7 +593,6 @@ p <- ggplot() +
 ggplotly(p, height = 500, width = 600)
 
 ```
-
 :::
 
 ::: {.column width="40%"}
@@ -624,7 +631,6 @@ fenz_max_depth_r2 <- tbl |>
 tbl |>
   knitr::kable(caption = "Model fit for max depth") 
 ```
-
 :::
 :::::
 
@@ -632,7 +638,6 @@ tbl |>
 
 ::::: columns
 ::: {.column width="60%"}
-
 ```{r}
 #| label: fig-mean-depth
 #| fig.cap: "Predicted vs observed mean depth. Note that the x and y axes are log10 scaled."
@@ -694,7 +699,6 @@ ggplotly(p, height = 500, width = 600)
 
 
 ```
-
 :::
 
 ::: {.column width="40%"}
@@ -733,13 +737,11 @@ fenz_mean_depth_r2 <- tbl |>
 tbl |>
   knitr::kable(caption = "Model fit for mean depth") 
 ```
-
 :::
 :::::
-::::::
+:::::::::
 
-
-## Machine learning {.r-fit-text .unnumbered .unlisted}
+## Conclusions {.r-fit-text data-name="Conclusions"}
 
 Bathymetric data from 156 lakes were digitised and collated for use in this study.
 
@@ -747,10 +749,11 @@ Using a machine learning model, we were able to predict maximum lake depth from 
 
 This was substantially better than the FENZ dataset, which had an $r^2$ = `r fenz_max_depth_r2` for max depth and `r fenz_mean_depth_r2` for mean depth.
 
-## Applications {.smaller data-name="Conclusions"}
+## Applications {.smaller}
 
--   Predicted depth data is used in the LERNZmp for lakes without bathymetric data.
--   Highlights lakes with limited depth data for future surveying.
+-   All data is available within the [LERNZmp](https://limnotrack.shinyapps.io/LERNZmp/).
+-   For lakes without bathymetric data, we can predict lake depth.
+-   Highlights lakes with limited depth data to target for future surveying.
 -   Provides a comprehensive database of lake depth and morphometry for Aotearoa New Zealand for future research.
 
 ## References {.unnumbered .unlisted}
