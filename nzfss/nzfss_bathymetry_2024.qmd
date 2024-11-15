@@ -71,7 +71,12 @@ id_names <- lyr |>
   sf::st_drop_geometry() |>
   dplyr::select(id_final, name_final)
 
-lake_summ <- read.csv("data/lake_bathy_summary.csv")
+gm_type <- lyr |> 
+  sf::st_drop_geometry() |> 
+  dplyr::select(id_final, GeomorphicType) 
+
+lake_summ <- read.csv("data/lake_bathy_summary.csv") |> 
+  dplyr::left_join(gm_type, by = c("id_final" = "id_final"))
 
 library(ggplot2)
 library(plotly)
@@ -275,39 +280,63 @@ tm_shape(nz_region_clip, name = "Region") +
 ```{r}
 #| label: fig-depth-area-latitude
 #| fig-cap: Summary of measured lake area and max depth by latitude and elevation.
+
+p <- ggplot() +
+  geom_point(data = lake_summ, aes(x = area_Ha, y = z_max, color = lat,
+                                   size = elevation)) +
+  # scale_colour_fermenter(palette = "RdYlBu") +
+  scale_color_viridis_c() +
+  scale_size_binned(breaks = c(0, 250, 500, 750, 1000, 2000)) +
+  scale_y_log10(breaks = c(1, 5, 10, 20, 50, 100, 400)) +
+  scale_x_log10(breaks = c(1, 5, 10, 50, 100, 1000, 10000)) +
+  # annotation_logticks() +
+  labs(x = "Area (ha)", y = "Depth (m)", color = "Latitude", 
+       size = "Elevation\n(masl)")+
+  theme_bw(base_size = 16)
+# p
+
+ggplotly(p) |> 
+  bslib::card(full_screen = TRUE)
+
+# plot_ly() |> 
+#   add_markers(data = lake_summ, x = ~area_Ha, y = ~z_max, color = ~lat,
+#               size = ~elevation, colors = c("#73D2DE", "#FFBC42", "#D81159"),
+#               hoverinfo = "text",
+#               text = paste0("Lake: ", lake_summ$name_final, "<br>",
+#                             "Area: ", round(lake_summ$area_Ha, 1), " Ha<br>",
+#                             "Max depth: ", round(lake_summ$z_max, 1), " m<br>",
+#                             "Latitude: ", round(lake_summ$lat, 1), "°<br>",
+#                             "Elevation: ", round(lake_summ$elevation, 1), " m")) |> 
+#   layout(xaxis = list(title = "Surface area (Ha)", type = "log"),
+#          yaxis = list(title = "Max depth (m)", type = "log"),
+#          legend = list(orientation = "h", x = 0.2, y = -0.2)) |> 
+#   colorbar(title = "Latitude") |>
+#   bslib::card(full_screen = TRUE)
+
+
+```
+
+## Lake depth-area & geomorphic type relationship {.smaller .unnumbered .unlisted}
+
+```{r}
+#| label: fig-depth-area-gmtypew
+#| fig-cap: Summary of measured lake area and max depth by geomorphic type.
 #| fig.width: 4
 #| fig.height: 5
 
-# p1 <- ggplot(lake_summ) +
-#   geom_hline(yintercept = 5, linetype = "dashed", colour = "black") +
-#   geom_vline(xintercept = 5, linetype = "dashed", colour = "black") +
-#   geom_point(aes(area_Ha, z_max, colour = lat,# shape = form_DV,
-#                  size = elevation), alpha = 0.8) +
-#   theme_bw() +
-#   scale_x_log10() +
-#   scale_y_log10() +
-#   annotation_logticks() +
-#   scale_colour_fermenter(palette = "RdYlBu") +
-#   scale_size_binned(breaks = c(0, 250, 500, 750, 1000, 2000)) +
-#   labs(x = "Surface area (Ha)", y = "Max depth (m)", colour = "Latitude",
-#        size = "Elevation (m)", shape = "Form") +
-#   theme(legend.position = "right")
-# p1
-
-plot_ly() |> 
-  add_markers(data = lake_summ, x = ~area_Ha, y = ~z_max, color = ~lat,
-              size = ~elevation, colors = c("#73D2DE", "#FFBC42", "#D81159"),
-              hoverinfo = "text",
-              text = paste0("Lake: ", lake_summ$name_final, "<br>",
-                            "Area: ", round(lake_summ$area_Ha, 1), " Ha<br>",
-                            "Max depth: ", round(lake_summ$z_max, 1), " m<br>",
-                            "Latitude: ", round(lake_summ$lat, 1), "°<br>",
-                            "Elevation: ", round(lake_summ$elevation, 1), " m")) |> 
-  layout(xaxis = list(title = "Surface area (Ha)", type = "log"),
-         yaxis = list(title = "Max depth (m)", type = "log"),
-         legend = list(orientation = "h", x = 0.2, y = -0.2)) |> 
-  colorbar(title = "Latitude") |>
+p <- ggplot() +
+  geom_point(data = lake_summ, aes(x = area_Ha, y = z_max, color = GeomorphicType)) +
+  geom_smooth(data = lake_summ, aes(x = area_Ha, y = z_max, color = GeomorphicType),
+              method = "lm", se = FALSE) +
+  scale_color_manual(values = geomorph_cols) +
+  scale_y_log10(breaks = c(1, 5, 10, 20, 50, 100, 400)) +
+  scale_x_log10(breaks = c(1, 5, 10, 50, 100, 1000)) +
+  labs(x = "Area (ha)", y = "Depth (m)", color = "Geomorphic\ntype")+
+  theme_bw(base_size = 16)
+# p
+ggplotly(p) |> 
   bslib::card(full_screen = TRUE)
+
 
 
 ```
