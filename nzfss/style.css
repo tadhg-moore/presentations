@@ -1,0 +1,24 @@
+.title {
+  font-size: 60px !important;
+  color: white !important;
+}
+
+.subtitle {
+  font-size: 25px !important;
+  color: white !important;
+  font-style: italic;
+}
+
+.quarto-title-authors {
+    column-count: 2; /* Adjust the number of columns as needed */
+    column-gap: 20px; /* Space between columns */
+}
+
+.quarto-title-affiliation {
+    display: none;
+}
+
+.date {
+  font-size: 20px;
+  color: white !important;
+}

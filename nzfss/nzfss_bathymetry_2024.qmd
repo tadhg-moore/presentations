@@ -1,13 +1,16 @@
 ---
 title: Morphometric distribution of depth and basin shape in Aotearoa New Zealand lakes
+subtitle: Using machine learning to improve national lake depth predictions
 format: 
   revealjs:
     theme: dark
     logo: www/limnotrack_border.jpg
+    title-slide-attributes:
+      data-state: "hide-menubar"
     footer: ""
     toc: true
-    template-partials:
-      - title-slide.html
+    # template-partials:
+    #   - title-slide.html
     transition: slide
     background-transition: fade
     controls: true
@@ -17,23 +20,37 @@ format:
     simplemenu:
         flat: true
         barhtml:
-            header: "<div class='menubar'><a class='logo' href='#'><img src='img/www/limnotrack_border.jpg'></a><ul class='menu'></ul><div class='slide-number'></div><div>"
-        scale: 0.8
+            header: "<div class='menubar'><ul class='menu'></ul><div>"
+        scale: 0.2
 revealjs-plugins:
     - simplemenu
 author:
   - name: Tadhg Moore
     affiliation: Limnotrack
-    orcid: 0000-0002-3834-8868
-    email: tadhg@limnotrack.com
+    # orcid: 0000-0002-3834-8868
+    # email: tadhg@limnotrack.com
   - name: Chris McBride
     affiliation: Limnotrack
   - name: Deniz Özkundakci
     affiliation: The University of Waikato
+  - name: Mathew Allen
+    affiliation: Waikato Regional Council
+  - name: Moritz K Lehmann
+    affiliation: Starboard Maritime Intelligence
+  - name: Matthew J Prentice
+    affiliation: The University of Waikato
+  - name: Whitney Woelmer
+    affiliation: The University of Waikato
+  - name: Maggie Armstrong
+    affiliation: The University of Waikato
+  - name: Kevin Rose
+    affiliation: Rensselaer Polytechnic Institute
 editor: visual
 editor_options: 
   chunk_output_type: console
 bibliography: references.bib
+date: "2024-11-19"
+css: style.css
 ---
 
 ```{r}
@@ -68,42 +85,36 @@ sc_df <- data.frame(source = names(source_cols), col = source_cols)
 
 ```
 
-## Overview {data-state="hide-menubar"}
 
--   (Background)[#Background]
--   Methods
--   Results
--   Conclusions
--   Future Work
 
-## Motivation {.smaller}
+## Motivation {.smaller data-name="Background"}
 
 -   Developing the Lake Ecosystem Research New Zealand modelling platfom (LERNZmp). ![](www/lernzmp_logo.png){width="105"}
 -   Lake depth and morphometry are key drivers of lake ecosystem function [@ganz2024], therefore accurate depth data is essential.
 -   The Freshwater Ecosystems New Zealand (FENZ) database is the most comprehensive database of lake morphometry in New Zealand, but is limited in its depth data.
 -   NZ lakes provide a unique opportunity to develop a comprehensive database of lake depth and morphometry, particularly given the diversity of lake size, depth and geomorphic type.
 
-## Objectives 
+## Objectives {.unnumbered .unlisted}
 
 -   Develop a comprehensive database of lake depth and morphometry for New Zealand.
 -   Use machine learning to predict mean and maximum lake depth from this data.
 -   Compare these predictions to the FENZ database and other global lake depth databases e.g. maximum lake depths - GLOBathy[@khazaei2022] and mean lake depth - HydroLAKES [@messager2016]
 
-## Background {.smaller data-name="Background"}
+## {.smaller}
 
 ::::: columns
-::: {.column width="30%"}
+::: {.column width="50%"}
 -   Lack of a central database on lake morphometry, particularly depth
 -   Large number of bathymetric data has been recorded across lakes in New Zealand
 -   Current predictions of max lake depth, within the FENZ database (n=`r n_fenz`) are limited and have clear biases
 :::
 
-::: {.column width="70%"}
+::: {.column width="50%"}
 ```{r}
 #| label: fig-fenz-depth-distribution
-#| fig.cap: "Depth distribution of FENZ lakes by geomorphic type"
+#| fig.cap: "Depth distribution of FENZ lakes. The x-axis is log10 scaled."
 #| fig.width: 6
-#| fig.height: 6
+#| fig.height: 4
 
 labs <- fenz_depths |> 
   sf::st_drop_geometry() |> 
@@ -115,13 +126,55 @@ df <- fenz_depths |>
   sf::st_drop_geometry() |> 
   dplyr::left_join(labs, by = "GeomorphicType")
 
-ggplot() +
-  geom_histogram(data = df, aes(x = z_max),
-                 bins = 30, colour = "white") +
-  facet_wrap(~label, scales = "free_y") +
-  scale_x_log10(breaks = c(1, 5, 10, 50, 100, 400)) +
-  labs(y = "Count", x = "Depth (m)")+
-  theme_bw(base_size = 14) 
+
+plot_ly() |>
+  add_histogram(data = df, x = ~log10(z_max), color = ~GeomorphicType,
+                colors = geomorph_cols, opacity = 1,
+                marker = list(line = list(color = "black", width = 1))) |>
+  layout(
+    xaxis = list(title = "log10(Depth)"),
+    yaxis = list(title = "Frequency"),
+    # legend = list(orientation = "h", x = 0.2, y = -0.2),
+    barmode = "stack"#,
+    # updatemenus = list(
+    #   list(
+    #     type = "buttons",  # Using buttons to control color visibility
+    #     x = 0.1,  # Positioning of the button
+    #     y = 1.05,  # Positioning of the button
+    #     buttons = list(
+    #       list(
+    #         label = "Fill Color On",
+    #         method = "restyle",
+    #         args = list("opacity", 1)  # Set fill color on by controlling opacity
+    #       ),
+    #       list(
+    #         label = "Fill Color Off",
+    #         method = "restyle",
+    #         args = list("opacity", 0.5)  # Set fill color off by controlling opacity
+    #       )
+    #     )
+    #   )
+    # )
+  )
+
+
+
+
+  # ggplot() +
+#   geom_point(data = df, aes(x = area_Ha, y = z_max, colour = GeomorphicType),
+#              alpha = 0.5, size = 1) +
+#   scale_y_log10(breaks = c(1, 5, 10, 20, 50, 100, 400)) +
+#   scale_x_log10(breaks = c(1, 5, 10, 50, 100, 1000)) +
+#   labs(x = "Area (ha)", y = "Depth (m)")+
+#   theme_bw(base_size = 16)
+
+  # ggplot() +
+#   geom_histogram(data = df, aes(x = z_max),
+#                  bins = 30, colour = "white") +
+#   facet_wrap(~label, scales = "free_y") +
+#   scale_x_log10(breaks = c(1, 5, 10, 50, 100, 400)) +
+#   labs(y = "Count", x = "Depth (m)")+
+#   theme_bw(base_size = 14) 
 
 # library(plotly)
 # plot_ly() |> 
@@ -134,6 +187,7 @@ ggplot() +
 #        yaxis = list(type = "log", title = "Depth (m)"))
 
 ```
+
 :::
 :::::
 
