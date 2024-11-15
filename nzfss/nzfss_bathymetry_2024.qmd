@@ -81,7 +81,7 @@ lake_summ <- read.csv("data/lake_bathy_summary.csv") |>
 library(ggplot2)
 library(plotly)
 library(bathytools)
-
+library(tidyr)
 
 # Set geomorphology colours
 geomorph_class <- unique(fenz_depths$GeomorphicType)
@@ -100,6 +100,8 @@ library(tmap)
 #                Sys.getenv("LINZ_BASEMAP_KEY"))
 # tmap_options(basemaps = "https://basemaps.linz.govt.nz/v1/tiles/aerial/WebMercatorQuad/{z}/{x}/{y}.webp?api=c01hsah0ttthgq51dgrqbw9r2bd", check.and.fix = TRUE)
 
+# Load R functions
+source("R/summarise_hyps.R")
 
 ```
 
@@ -108,7 +110,7 @@ library(tmap)
 ## Motivation {.smaller data-name="Background"}
 
 -   Developing the Lake Ecosystem Research New Zealand modelling platfom (LERNZmp). ![](www/lernzmp_logo.png){width="105"}
--   Lake depth and morphometry are key drivers of lake ecosystem function [@ganz2024], therefore accurate depth data is essential.
+-   Lake depth and morphometry are key drivers of lake ecosystem function, therefore accurate depth data is essential [@ganz2024].
 -   The Freshwater Ecosystems New Zealand (FENZ) database is the most comprehensive database of lake morphometry in New Zealand, but is limited in its depth data.
 -   NZ lakes provide a unique opportunity to develop a comprehensive database of lake depth and morphometry, particularly given the diversity of lake size, depth and geomorphic type.
 
@@ -200,10 +202,27 @@ p <- ggplot() +
                  bins = 30, colour = "white") +
   scale_x_log10(breaks = c(1, 5, 10, 50, 100, 400)) +
   scale_fill_manual(values = cols) +
-  labs(y = "Count", x = "Depth (m)", fill = "Geomorphic\ntype")+
-  theme_bw(base_size = 14)
+  labs(y = "Count", x = "Depth (m)", fill = "Geomorphic type") +
+  theme_bw(base_size = 14)+
+  theme(legend.position="bottom", legend.box = "horizontal",
+    legend.title = element_text(size = 10),
+        legend.text = element_text(size = 10)) 
 
-ggplotly(p, height = 500, width = 500)
+# Legend
+l <- list(
+  font = list(
+    family = "sans-serif",
+    size = 12,
+    color = "#000"),
+  x = 0.7, y = 0.95,
+  bgcolor = "#E2E2E2",
+  bordercolor = "#FFFFFF",
+  borderwidth = 2)
+
+ggplotly(p, height = 500, width = 600) |> 
+  layout(showlegend = T,
+    legend = l)
+
 
 
 # library(plotly)
@@ -221,21 +240,6 @@ ggplotly(p, height = 500, width = 500)
 :::
 :::::
 
-## Max depth vs Lake area {.unnumbered .unlisted}
-
-```{r}
-#| label: fig-fenz-depth-area
-#| fig.cap: "Depth vs Area of FENZ lakes"
-
-ggplot() +
-  geom_point(data = fenz_depths, aes(x = area_Ha, y = z_max),
-             alpha = 0.2, size = 1) +
-  scale_y_log10(breaks = c(1, 5, 10, 20, 50, 100, 400)) +
-  scale_x_log10(breaks = c(1, 5, 10, 50, 100, 1000)) +
-  labs(x = "Area (ha)", y = "Depth (m)")+
-  theme_bw(base_size = 16) 
-
-```
 
 ## Bathymetry example: Lake Rotoma {.smaller .unnumbered .unlisted}
 
@@ -261,7 +265,7 @@ tm_shape(cont, name = "Depth contours") +
 
 ```
 
-## Bathymetry example: Lake Rotoma {.smaller .unnumbered .unlisted}
+## Bathymetry example: Lake Rotoma {.smaller .unnumbered .unlisted transition="fade"}
 
 Bathymetry raster
 
@@ -281,7 +285,7 @@ tm_shape(bathy) +
 
 ```
 
-## Bathymetry example: Lake Rotoma {.smaller .unnumbered .unlisted}
+## Bathymetry example: Lake Rotoma {.smaller .unnumbered .unlisted transition="fade"}
 
 Estimated hypsographic curve
 
@@ -289,21 +293,28 @@ Estimated hypsographic curve
 #| label: fig-rotoma-bathymetry-3d
 #| fig.cap: "Three dimensional rendering of Lake Rotoma's bathymetry."
 
-bathytools::plot_raster_3d(x = bathy, cols = "bathy", shoreline = shoreline)
+bathytools::plot_raster_3d(x = bathy, cols = "bathy", shoreline = shoreline) |> layout(height = 500, width = 700)
 
 ```
 
-## Bathymetry example: Lake Rotoma {.smaller .unnumbered .unlisted}
+## Bathymetry example: Lake Rotoma {.smaller .unnumbered .unlisted transition="fade"}
 
+::::: columns
+::: {.column width="50%" .fragment}
 Estimated hypsographic curve
 
 ```{r}
 #| label: fig-rotoma-hypsograph
-#| fig.cap: "Depth raster of Lake Rotoma, a large lake in the Bay of Plenty region."
+#| fig.cap: "Hypsograph curve of Lake Rotoma."
 #| fig.width: 6
 #| fig.height: 4
 
 hyps <- bathy_to_hypso(bathy_raster = bathy)
+elevation <- lake_summ |> 
+  dplyr::filter(id_final == "LID 40102") |> 
+  dplyr::pull(elevation)
+hyps <- hyps |> 
+  dplyr::mutate(elev = elevation + depth)
 
 p <- ggplot() +
   geom_point(data = hyps, aes(y = depth, x = area)) +
@@ -313,8 +324,30 @@ p <- ggplot() +
 p
 # ggplotly(p, height = 500, width = 500)
 
+summ <- summarise_hyps(hyps = hyps, shoreline = shoreline) |> 
+  dplyr::mutate(Lake = "Rotoma") |>
+  dplyr::select(Lake, Z_max, Z_mean, DV, area_Ha, shore_length, sdi) |>
+  dplyr::rename(`Max depth` = Z_max, `Mean depth` = Z_mean, `Shoreline development index` = sdi, `Volume development index` = DV, `Shoreline length (km)` = shore_length, `Area (ha)` = area_Ha) 
+
 ```
 
+:::
+::: {.column width="50%" .fragment}
+Hypsographic summary
+
+```{r}
+#| label: tbl-rotoma-hyps
+#| tbl.cap: "Hypsographic summary of Lake Rotoma"
+
+summ |>
+  tidyr::pivot_longer(cols = -Lake, names_to = "Variable", values_to = "Value") |> 
+  dplyr::select(-Lake) |> 
+  knitr::kable(caption = "Hypsographic summary of Lake Rotoma") 
+
+```
+
+:::
+:::::
 
 ## Lakes with bathymetry data {.smaller .unnumbered .unlisted}
 
