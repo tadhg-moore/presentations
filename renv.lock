@@ -9,6 +9,13 @@
     ]
   },
   "Packages": {
+    "BH": {
+      "Package": "BH",
+      "Version": "1.84.0-0",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "a8235afbcd6316e6e91433ea47661013"
+    },
     "DBI": {
       "Package": "DBI",
       "Version": "1.2.3",
@@ -45,6 +52,17 @@
         "utils"
       ],
       "Hash": "0cafd6f0500e5deba33be22c46bf6055"
+    },
+    "MBA": {
+      "Package": "MBA",
+      "Version": "0.1-2",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Requirements": [
+        "BH",
+        "R"
+      ],
+      "Hash": "bbeb7f28140fccd7253b308fbe7b50a7"
     },
     "Matrix": {
       "Package": "Matrix",
@@ -137,6 +155,27 @@
         "R"
       ],
       "Hash": "543776ae6848fde2f48ff3816d0628bc"
+    },
+    "bathytools": {
+      "Package": "bathytools",
+      "Version": "0.0.0.9000",
+      "Source": "GitHub",
+      "RemoteType": "github",
+      "RemoteHost": "api.github.com",
+      "RemoteUsername": "limnotrack",
+      "RemoteRepo": "bathytools",
+      "RemoteRef": "main",
+      "RemoteSha": "9c5c9bc7d7852730dec52a834755df8251286be8",
+      "Requirements": [
+        "MBA",
+        "dplyr",
+        "plotly",
+        "sf",
+        "terra",
+        "tmap",
+        "units"
+      ],
+      "Hash": "8f136d4784f527355c9f0e05a63c5e8e"
     },
     "bslib": {
       "Package": "bslib",
