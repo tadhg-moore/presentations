@@ -254,10 +254,20 @@ ggplotly(p, height = 500, width = 600) |>
 -   Shoreline data were updated using satellite and aerial imagery.
 :::
 
--   Depth data were interpolated using a Multilevel B-Spline Approximation (MBA) algorithm. ::: {.fragment}
--   Hypsographic curves were calculated for each lake. :::
--   Comparison of depth and area with other databases. ::: {.fragment}
--   Used machine learning to predict lake depth from morphometric data for all lakes in New Zealand and benchmark against the FENZ dataset. :::
+::: fragment
+-   Depth data were interpolated using a Multilevel B-Spline Approximation (MBA) algorithm. 
+:::
+
+::: {.fragment}
+-   Hypsographic curves were calculated for each lake. 
+:::
+::: {.fragment}
+-   Comparison of depth and area with other databases.
+:::
+
+::: {.fragment}
+-   Used machine learning to predict lake depth from morphometric data for all lakes in New Zealand and benchmark against the FENZ dataset. 
+:::
 
 ## Bathymetry example: Lake Rotoma {.smaller .unnumbered .unlisted transition="fade"}
 
@@ -409,7 +419,7 @@ tm_shape(nz_region_clip, name = "Region") +
 :::
 :::::
 
-## Depth-area relationship {.smaller .unnumbered .unlisted data-name="Results"}
+## Depth-area relationship {.smaller .unnumbered .unlisted data-name="Results" transition="fade"}
 
 ```{r}
 #| label: fig-depth-area-latitude
@@ -439,7 +449,7 @@ ggplotly(p, height = 500, width = 700)
 
 ```
 
-## Breakdown by geomorphic type {.smaller .unnumbered .unlisted}
+## Breakdown by geomorphic type {.smaller .unnumbered .unlisted transition="fade"}
 
 ```{r}
 #| label: fig-depth-area-gmtype
@@ -526,6 +536,12 @@ p <- ggplot() +
 p
 
 ```
+
+![](www/convex.png){.absolute top=30 right=60 width="140" height="90"}
+
+
+![](www/concave.png){.absolute bottom=180 right=60 width="140" height="90"}
+
 
 ## Predicting mean and max depth {.smaller .unnumbered .unlisted}
 
