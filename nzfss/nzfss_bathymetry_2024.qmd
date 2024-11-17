@@ -485,6 +485,75 @@ ggplotly(p, height = 500, width = 700)
 
 ```
 
+## Distribution of lake hypsograph shape
+
+```{r}
+#| label: fig-hypsograph-gmtype
+#| fig.cap: "Distribution of hypsograph shape by geomorphic type. Solid black line indicated the median and the dashed red line represents the 1:1 line."
+
+all_hyps <- readRDS("data/all_hyps.rds")
+
+# Calculate the median hypsograph
+median_hyps <- all_hyps |> 
+  # dplyr::filter(!is.na(GeomorphicType)) |>
+  dplyr::group_by(LID) |> 
+  dplyr::reframe(norm_area = approx(norm_depth, norm_area, seq(0, 1, 0.05),
+                                     rule = 2)$y,
+                 GeomorphicType = GeomorphicType[1],
+                 n_depth = seq(0, 1, 0.05)) |>
+  dplyr::group_by(n_depth) |>
+  dplyr::summarise(n_area = median(norm_area),
+                   mean_area = mean(norm_area),
+                   std = sd(norm_area),
+                   q1 = mean_area - std,
+                   q3 = mean_area + std
+                   # q1 = quantile(norm_area, 0.25),
+                   # q3 = quantile(norm_area, 0.75)
+                   ) |>
+  dplyr::mutate(q1 = ifelse(q1 < 0, 0, q1),
+                q3 = ifelse(q3 > 1, 1, q3),
+                GeomorphicType = "Median") |>
+  dplyr::ungroup() |> 
+    dplyr::rename(`Geomorphic type` = GeomorphicType, `Normalised area` = n_area, `Normalised depth` = n_depth)
+
+
+# Calculate the Geomorphic Type median hypsograph
+gm_hyps <- all_hyps |> 
+  dplyr::filter(!is.na(GeomorphicType)) |>
+  dplyr::group_by(LID) |> 
+  dplyr::reframe(norm_area = approx(norm_depth, norm_area, seq(0, 1, 0.05),
+                                     rule = 2)$y,
+                 GeomorphicType = GeomorphicType[1],
+                 n_depth = seq(0, 1, 0.05)) |>
+  dplyr::group_by(GeomorphicType, n_depth) |>
+  dplyr::summarise(n_area = median(norm_area),
+                   mean_area = mean(norm_area),
+                   std = sd(norm_area),
+                   q1 = mean_area - std,
+                   q3 = mean_area + std
+                   # q1 = quantile(norm_area, 0.25),
+                   # q3 = quantile(norm_area, 0.75)
+                   ) |> 
+  dplyr::rename(`Geomorphic type` = GeomorphicType, `Normalised area` = n_area, `Normalised depth` = n_depth)
+
+cols <- c(geomorph_cols, "Median" = "black")
+
+p <- ggplot() +
+  geom_line(data = gm_hyps, aes(x = `Normalised area`, y = `Normalised depth`, color = `Geomorphic type`)) +
+  geom_line(data = median_hyps, aes(x = `Normalised area`, y = `Normalised depth`, color = `Geomorphic type`), linewidth = 2, alpha = 0.5) +
+  geom_abline(intercept = -1, slope = 1, linetype = "dashed", color = "red") +
+  scale_color_manual(values = cols) +
+  scale_y_reverse() +
+  labs(x = "Normalised area", y = "Normalised depth", color = "Geomorphic type") +
+  coord_equal() +
+  theme_bw(base_size = 14) 
+p
+
+ggplotly(p, height = 500, width = 700)
+
+```
+
+
 ## Distribution of volume development
 
 Development of Volume, $D_V$ (Hutchinson 1957) is a measure of departure of the shape of the lake basin from that of a cone calculated using the maximum depth $Z_{max}$ and the average depth $\bar{Z}$ :
