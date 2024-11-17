@@ -132,7 +132,7 @@ FENZ Lakes
 -   Current predictions of max lake depth, within the FENZ database (n=`r n_fenz`) are limited and have clear biases
 :::
 
-::: {.column width="60%"}
+::: {.column width="60%" .fragment}
 ```{r}
 #| label: fig-fenz-depth-distribution
 #| fig.cap: "Depth distribution of FENZ lakes. The x-axis is log10 scaled."
@@ -247,7 +247,7 @@ ggplotly(p, height = 500, width = 600) |>
 :::
 
 ::: fragment
--   Lake maximum depth data which were known, but did not have bathymetry data available were added to the dataset (n=`r n_depths - n_bathy`) bringing us to a total `r n_depths` lakes with maximum depth data.
+-   Lake maximum depth data which were known, but did not have bathymetry data available were added to the dataset (n=`r n_depths - n_bathy`) bringing us to a total of `r n_depths` lakes with maximum depth data.
 :::
 
 ::: fragment
@@ -315,7 +315,7 @@ tm_shape(bathy) +
 
 ## Bathymetry example: Lake Rotoma {.smaller .unnumbered .unlisted .center transition="fade"}
 
-Estimated hypsographic curve
+Estimated lake bed
 
 ```{r}
 #| label: fig-rotoma-bathymetry-3d
@@ -382,6 +382,9 @@ summ |>
 ::: {.column width="50%"}
 -   Lakes with bathymetric data are relatively evenly distributed across New Zealand.
 -   Lake geomorphic type is highly regionalised.
+-   Lakes which have maximum depth data but no bathymetry data highlight that there is probably a further bathymetry data out there.
+
+-   Some lakes, particularly glacial lakes might have quite a dynamic bathymetry.
 :::
 
 ::: {.column width="50%"}
@@ -423,7 +426,7 @@ tm_shape(nz_region_clip, name = "Region") +
 
 ```{r}
 #| label: fig-depth-area-latitude
-#| fig-cap: Summary of measured lake area and max depth by latitude and elevation. The size of the point represents the elevation of the lake.
+#| fig-cap: Summary of measured lake area and max depth by latitude and elevation (n=192). The size of the point represents the elevation of the lake.
 
 df <- lake_summ |> 
   dplyr::rename(Area = area_Ha, Depth = z_max, Elevation = elevation, 
@@ -549,7 +552,7 @@ p
 ### Methods
 
 -   Used a random forest machine learning model from the [caret](https://topepo.github.io/caret/index.html) R package to predict mean and maximum lake depth from morphometric data [@kuhn2008].
--   Covariates included variables available for all lakse in the dataset: lake area, elevation, latitude, shoreline development index, geomorphic type and other climate and catchment characteristics.
+-   Covariates included variables available for all lakes in the dataset: lake area, elevation, latitude, shoreline development index, geomorphic type and other climate and catchment characteristics.
 
 ### Max depth
 
@@ -759,18 +762,24 @@ tbl |>
 
 ## Conclusions {.r-fit-text data-name="Conclusions"}
 
-Bathymetric data from 156 lakes were digitised and collated for use in this study.
+-   Bathymetric data from 156 lakes were digitised and collated for use in this study.
 
-Using a machine learning model, we were able to predict maximum lake depth from morphometric data with an $r^2$ = `r max_depth_r2` and mean lake depth with an $r^2$ = `r mean_depth_r2`.
+-   Using a machine learning model, we were able to predict maximum lake depth from morphometric data with an $r^2$ = `r max_depth_r2` and mean lake depth with an $r^2$ = `r mean_depth_r2`.
 
-This was substantially better than the FENZ dataset, which had an $r^2$ = `r fenz_max_depth_r2` for max depth and `r fenz_mean_depth_r2` for mean depth.
+-   This was substantially better than the FENZ dataset, which had an $r^2$ = `r fenz_max_depth_r2` for max depth and `r fenz_mean_depth_r2` for mean depth.
 
 ## Applications {.smaller}
 
 -   All data is available within the [LERNZmp](https://limnotrack.shinyapps.io/LERNZmp/).
--   For lakes without bathymetric data, we can predict lake depth.
+-   For lakes without bathymetric data, we can predict lake depth with a high degree of accuracy compared to other datasets.
 -   Highlights lakes with limited depth data to target for future surveying.
--   Provides a comprehensive database of lake depth and morphometry for Aotearoa New Zealand for future research.
+-   Provides a comprehensive database of lake depth, morphometry and other characteristics within Aotearoa New Zealand for future research.
+
+## Acknowledgements {.smaller}
+
+-   This project was funded by the New Zealand Ministry of Business, Innovation and Employment (MBIE) through the Smart Ideas program within the Endeavour Fund (grant UOWX2103).
+
+-   We would like to thank all our data contributors who provided data for the LERNZmp project.
 
 ## References {.unnumbered .unlisted}
 
