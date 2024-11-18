@@ -2,140 +2,140 @@
   {
     "objectID": "nzfss/nzfss_bathymetry_2024.html#motivation",
     "href": "nzfss/nzfss_bathymetry_2024.html#motivation",
-    "title": "Morphometric distribution of depth and basin shape in Aotearoa New Zealand lakes",
+    "title": "Using machine learning to improve national lake depth predictions",
     "section": "Motivation",
     "text": "Motivation\n\nDeveloping the Lake Ecosystem Research New Zealand modelling platfom (LERNZmp). \nLake depth and morphometry are key drivers of lake ecosystem function, therefore accurate depth data is essential (Ganz, Glines, and Rose 2024).\nThe Freshwater Ecosystems New Zealand (FENZ) database is the most comprehensive database of lake morphometry in New Zealand, but is limited in its depth data.\nNZ lakes provide a unique opportunity to develop a comprehensive database of lake depth and morphometry, particularly given the diversity of lake size, depth and geomorphic type."
   },
   {
     "objectID": "nzfss/nzfss_bathymetry_2024.html#objectives",
     "href": "nzfss/nzfss_bathymetry_2024.html#objectives",
-    "title": "Morphometric distribution of depth and basin shape in Aotearoa New Zealand lakes",
+    "title": "Using machine learning to improve national lake depth predictions",
     "section": "Objectives",
     "text": "Objectives\n\nDevelop a comprehensive database of lake depth and morphometry for New Zealand.\nUse machine learning to predict mean and maximum lake depth from this data.\nCompare these predictions to the FENZ database and other global lake depth databases e.g. maximum lake depths - GLOBathy(Khazaei et al. 2022) and mean lake depth - HydroLAKES (Messager et al. 2016)"
   },
   {
     "objectID": "nzfss/nzfss_bathymetry_2024.html#section",
     "href": "nzfss/nzfss_bathymetry_2024.html#section",
-    "title": "Morphometric distribution of depth and basin shape in Aotearoa New Zealand lakes",
+    "title": "Using machine learning to improve national lake depth predictions",
     "section": "",
-    "text": "FENZ Lakes\n\n\n\nLack of a central database on lake morphometry, particularly depth\nLarge number of bathymetric data has been recorded across lakes in New Zealand\nCurrent predictions of max lake depth, within the FENZ database (n=3475) are limited and have clear biases\n\n\n\n\n\n\n\n\n\n\nFigure 1: Depth distribution of FENZ lakes. The x-axis is log10 scaled."
+    "text": "Freshwater Ecosystems of New Zealand Database\n\n\n\nLack of a central database on lake morphometry, particularly depth\nLarge number of bathymetric data has been recorded across lakes in New Zealand\nCurrent predictions of max lake depth, within the FENZ database (n=3475) are limited and have clear biases\n\n\n\n\n\n\n\n\n\n\nFigure 1: Depth distribution of FENZ lakes. The x-axis is log10 scaled."
   },
   {
     "objectID": "nzfss/nzfss_bathymetry_2024.html#methods",
     "href": "nzfss/nzfss_bathymetry_2024.html#methods",
-    "title": "Morphometric distribution of depth and basin shape in Aotearoa New Zealand lakes",
+    "title": "Using machine learning to improve national lake depth predictions",
     "section": "Methods",
-    "text": "Methods\n\n\nBathymetry survey data were sourced from a variety of sources - paper maps, digital files, and online databases (n=156).\n\n\n\n\nLake maximum depth data which were known, but did not have bathymetry data available were added to the dataset (n=36) bringing us to a total of 192 lakes with maximum depth data.\n\n\n\n\nShoreline data were updated using satellite and aerial imagery.\n\n\n\n\nDepth data were interpolated using a Multilevel B-Spline Approximation (MBA) algorithm.\n\n\n\n\nHypsographic curves were calculated for each lake.\n\n\n\n\nComparison of depth and area with other databases.\n\n\n\n\nUsed machine learning to predict lake depth from morphometric data for all lakes in New Zealand and benchmark against the FENZ dataset."
+    "text": "Methods\n\n\nBathymetry survey data were sourced from a variety of sources - paper maps, digital files, and online databases (n=156).\n\n\n\n\nLake maximum depth data which were known, but did not have bathymetry data available were added to the dataset (n=36) bringing us to a total of 192 lakes with maximum depth data (Lakes380).\n\n\n\n\nShoreline data were updated using satellite and aerial imagery.\n\n\n\n\nDepth data were interpolated using a Multilevel B-Spline Approximation (MBA) algorithm.\n\n\n\n\nHypsographic curves were calculated for each lake.\n\n\n\n\nComparison of depth and area with other databases.\n\n\n\n\nUsed machine learning to predict lake depth from morphometric data for all lakes in New Zealand and benchmark against the FENZ dataset."
   },
   {
     "objectID": "nzfss/nzfss_bathymetry_2024.html#bathymetry-example-lake-rotoma",
     "href": "nzfss/nzfss_bathymetry_2024.html#bathymetry-example-lake-rotoma",
-    "title": "Morphometric distribution of depth and basin shape in Aotearoa New Zealand lakes",
+    "title": "Using machine learning to improve national lake depth predictions",
     "section": "Bathymetry example: Lake Rotoma",
     "text": "Bathymetry example: Lake Rotoma\nDepth contours\n\n\n\n\n\n\n\n\nFigure 2: Depth contours of Lake Rotoma, a large lake in the Bay of Plenty region."
   },
   {
     "objectID": "nzfss/nzfss_bathymetry_2024.html#bathymetry-example-lake-rotoma-1",
     "href": "nzfss/nzfss_bathymetry_2024.html#bathymetry-example-lake-rotoma-1",
-    "title": "Morphometric distribution of depth and basin shape in Aotearoa New Zealand lakes",
+    "title": "Using machine learning to improve national lake depth predictions",
     "section": "Bathymetry example: Lake Rotoma",
     "text": "Bathymetry example: Lake Rotoma\nBathymetry raster\n\n\n\n\n\n\n\n\nFigure 3: Depth raster of Lake Rotoma, a large lake in the Bay of Plenty region."
   },
   {
     "objectID": "nzfss/nzfss_bathymetry_2024.html#bathymetry-example-lake-rotoma-2",
     "href": "nzfss/nzfss_bathymetry_2024.html#bathymetry-example-lake-rotoma-2",
-    "title": "Morphometric distribution of depth and basin shape in Aotearoa New Zealand lakes",
+    "title": "Using machine learning to improve national lake depth predictions",
     "section": "Bathymetry example: Lake Rotoma",
     "text": "Bathymetry example: Lake Rotoma\nEstimated lake bed\n\n\n\n\n\n\n\n\nFigure 4: Three dimensional rendering of Lake Rotoma’s bathymetry."
   },
   {
     "objectID": "nzfss/nzfss_bathymetry_2024.html#bathymetry-example-lake-rotoma-3",
     "href": "nzfss/nzfss_bathymetry_2024.html#bathymetry-example-lake-rotoma-3",
-    "title": "Morphometric distribution of depth and basin shape in Aotearoa New Zealand lakes",
+    "title": "Using machine learning to improve national lake depth predictions",
     "section": "Bathymetry example: Lake Rotoma",
-    "text": "Bathymetry example: Lake Rotoma\n\n\nEstimated hypsographic curve\n\n\n\n\n\n\n\n\nFigure 5: Hypsograph curve of Lake Rotoma.\n\n\n\n\n\n\nHypsographic summary\n\n\n\n\nTable 1: Hypsographic summary of Lake Rotoma\n\n\n\n\n\n\nVariable\nValue\n\n\n\n\nMax depth\n89.21\n\n\nMean depth\n45.44\n\n\nVolume development index\n1.53\n\n\nArea (ha)\n1063.25\n\n\nShoreline length (km)\n23.40\n\n\nShoreline development index\n2.04"
+    "text": "Bathymetry example: Lake Rotoma\n\n\nEstimated hypsographic curve\n\n\n\n\n\n\n\n\nFigure 5: Hypsograph curve of Lake Rotoma.\n\n\n\n\n\n\nHypsographic summary\n\n\n\n\nTable 1: Hypsographic summary of Lake Rotoma\n\n\n\n\n\n\nVariable\nValue\n\n\n\n\nMax depth\n89.69\n\n\nMean depth\n45.39\n\n\nVolume development index\n1.52\n\n\nArea (ha)\n1063.48\n\n\nShoreline length (km)\n23.40\n\n\nShoreline development index\n2.04"
   },
   {
     "objectID": "nzfss/nzfss_bathymetry_2024.html#lakes-with-bathymetry-data",
     "href": "nzfss/nzfss_bathymetry_2024.html#lakes-with-bathymetry-data",
-    "title": "Morphometric distribution of depth and basin shape in Aotearoa New Zealand lakes",
+    "title": "Using machine learning to improve national lake depth predictions",
     "section": "Lakes with bathymetry data",
     "text": "Lakes with bathymetry data\n\n\n\nLakes with bathymetric data are relatively evenly distributed across New Zealand.\nLake geomorphic type is highly regionalised.\nLakes which have maximum depth data but no bathymetry data highlight that there is probably a further bathymetry data out there.\nSome lakes, particularly glacial lakes might have quite a dynamic bathymetry.\n\n\n\n\n\n\n\n\n\n\nFigure 6: Map of lakes with bathymetric data and maximum depth data in New Zealand. Lakes with bathymetry data have a black marker."
   },
   {
     "objectID": "nzfss/nzfss_bathymetry_2024.html#depth-area-relationship",
     "href": "nzfss/nzfss_bathymetry_2024.html#depth-area-relationship",
-    "title": "Morphometric distribution of depth and basin shape in Aotearoa New Zealand lakes",
+    "title": "Using machine learning to improve national lake depth predictions",
     "section": "Depth-area relationship",
     "text": "Depth-area relationship\n\n\n\n\n\n\n\n\nFigure 7: Summary of measured lake area and max depth by latitude and elevation (n=192). The size of the point represents the elevation of the lake."
   },
   {
     "objectID": "nzfss/nzfss_bathymetry_2024.html#breakdown-by-geomorphic-type",
     "href": "nzfss/nzfss_bathymetry_2024.html#breakdown-by-geomorphic-type",
-    "title": "Morphometric distribution of depth and basin shape in Aotearoa New Zealand lakes",
+    "title": "Using machine learning to improve national lake depth predictions",
     "section": "Breakdown by geomorphic type",
     "text": "Breakdown by geomorphic type\n\n\n\n\n\n\n\n\nFigure 8: Summary of measured lake area and max depth by geomorphic type."
   },
   {
     "objectID": "nzfss/nzfss_bathymetry_2024.html#distribution-of-lake-hypsograph-shape",
     "href": "nzfss/nzfss_bathymetry_2024.html#distribution-of-lake-hypsograph-shape",
-    "title": "Morphometric distribution of depth and basin shape in Aotearoa New Zealand lakes",
+    "title": "Using machine learning to improve national lake depth predictions",
     "section": "Distribution of lake hypsograph shape",
     "text": "Distribution of lake hypsograph shape\n\n\n\n\n\n\n\n\nFigure 9: Distribution of hypsograph shape by geomorphic type. Solid black line indicated the median and the dashed red line represents the 1:1 line."
   },
   {
     "objectID": "nzfss/nzfss_bathymetry_2024.html#distribution-of-volume-development",
     "href": "nzfss/nzfss_bathymetry_2024.html#distribution-of-volume-development",
-    "title": "Morphometric distribution of depth and basin shape in Aotearoa New Zealand lakes",
+    "title": "Using machine learning to improve national lake depth predictions",
     "section": "Distribution of volume development",
     "text": "Distribution of volume development\nDevelopment of Volume, \\(D_V\\) (Hutchinson 1957) is a measure of departure of the shape of the lake basin from that of a cone calculated using the maximum depth \\(Z_{max}\\) and the average depth \\(\\bar{Z}\\) :\n\\[D_V = \\frac{3 \\times \\bar{Z}}{Z_{max}}\\] \\(D_V\\) is greatest in shallow lakes with flat bottoms and low in deep lakes with steep sides."
   },
   {
     "objectID": "nzfss/nzfss_bathymetry_2024.html#section-1",
     "href": "nzfss/nzfss_bathymetry_2024.html#section-1",
-    "title": "Morphometric distribution of depth and basin shape in Aotearoa New Zealand lakes",
+    "title": "Using machine learning to improve national lake depth predictions",
     "section": "",
     "text": "Figure 10: Distribution of volume development (DV) by geomorphic type."
   },
   {
     "objectID": "nzfss/nzfss_bathymetry_2024.html#predicting-mean-and-max-depth",
     "href": "nzfss/nzfss_bathymetry_2024.html#predicting-mean-and-max-depth",
-    "title": "Morphometric distribution of depth and basin shape in Aotearoa New Zealand lakes",
+    "title": "Using machine learning to improve national lake depth predictions",
     "section": "Predicting mean and max depth",
     "text": "Predicting mean and max depth\n\nMethodsMax depthMean depth\n\n\n\nUsed a random forest machine learning model from the caret R package to predict mean and maximum lake depth from morphometric data (Kuhn 2008).\nCovariates included variables available for all lakes in the dataset: lake area, elevation, latitude, shoreline development index, geomorphic type and other climate and catchment characteristics.\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nFigure 11: Predicted vs observed max depth. Note that the x and y axes are log10 scaled.\n\n\n\n\n\n\n\n\n\nTable 2: Model fit for max depth\n\n\n\n\n\n\nSource\nN\nBias\nRMSE\nR2\n\n\n\n\nFENZ\n183\n-0.79\n44.64\n0.70\n\n\nGloBATHY\n119\n20.93\n72.68\n0.43\n\n\nML model\n190\n-0.49\n19.17\n0.95\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nFigure 12: Predicted vs observed mean depth. Note that the x and y axes are log10 scaled.\n\n\n\n\n\n\n\n\n\n\nFigure 13: Predicted vs observed mean depth. Note that the x and y axes are log10 scaled.\n\n\n\n\n\n\n\n\n\n\nTable 3: Model fit for mean depth\n\n\n\n\n\n\nSource\nN\nBias\nRMSE\nR2\n\n\n\n\nFENZ\n155\n6.24\n21.59\n0.71\n\n\nHydrolakes\n91\n7.27\n22.48\n0.79\n\n\nML model\n155\n-0.15\n7.80\n0.97"
   },
   {
     "objectID": "nzfss/nzfss_bathymetry_2024.html#ml-model-vs-fenz",
     "href": "nzfss/nzfss_bathymetry_2024.html#ml-model-vs-fenz",
-    "title": "Morphometric distribution of depth and basin shape in Aotearoa New Zealand lakes",
+    "title": "Using machine learning to improve national lake depth predictions",
     "section": "ML Model vs FENZ",
     "text": "ML Model vs FENZ\n\n\nFigure 14: Comparison of distributions of predicted max depth from the ML model and FENZ dataset. The vertical dashed line represents the median depth."
   },
   {
     "objectID": "nzfss/nzfss_bathymetry_2024.html#conclusions",
     "href": "nzfss/nzfss_bathymetry_2024.html#conclusions",
-    "title": "Morphometric distribution of depth and basin shape in Aotearoa New Zealand lakes",
+    "title": "Using machine learning to improve national lake depth predictions",
     "section": "Conclusions",
     "text": "Conclusions\n\nBathymetric data from 156 lakes were digitised and collated for use in this study.\nUsing a machine learning model, we were able to predict maximum lake depth from morphometric data with an \\(r^2\\) = 0.95 and mean lake depth with an \\(r^2\\) = 0.97.\nThis was substantially better than the FENZ dataset, which had an \\(r^2\\) = 0.7 for max depth and 0.71 for mean depth."
   },
   {
     "objectID": "nzfss/nzfss_bathymetry_2024.html#applications",
     "href": "nzfss/nzfss_bathymetry_2024.html#applications",
-    "title": "Morphometric distribution of depth and basin shape in Aotearoa New Zealand lakes",
+    "title": "Using machine learning to improve national lake depth predictions",
     "section": "Applications",
     "text": "Applications\n\nAll data is available within the LERNZmp.\nFor lakes without bathymetric data, we can predict lake depth with a high degree of accuracy compared to other datasets.\nHighlights lakes with limited depth data to target for future surveying.\nProvides a comprehensive database of lake depth, morphometry and other characteristics within Aotearoa New Zealand for future research."
   },
   {
     "objectID": "nzfss/nzfss_bathymetry_2024.html#acknowledgements",
     "href": "nzfss/nzfss_bathymetry_2024.html#acknowledgements",
-    "title": "Morphometric distribution of depth and basin shape in Aotearoa New Zealand lakes",
+    "title": "Using machine learning to improve national lake depth predictions",
     "section": "Acknowledgements",
     "text": "Acknowledgements\n\nThis project was funded by the New Zealand Ministry of Business, Innovation and Employment (MBIE) through the Smart Ideas program within the Endeavour Fund (grant UOWX2103).\nWe would like to thank all our data contributors who provided data for the LERNZmp project."
   },
   {
     "objectID": "nzfss/nzfss_bathymetry_2024.html#references",
     "href": "nzfss/nzfss_bathymetry_2024.html#references",
-    "title": "Morphometric distribution of depth and basin shape in Aotearoa New Zealand lakes",
+    "title": "Using machine learning to improve national lake depth predictions",
     "section": "References",
     "text": "References\n\n\nGanz, Keenan J., Max R. Glines, and Kevin C. Rose. 2024. “The Distribution of Depth, Volume, and Basin Shape for Lakes in the Conterminous United States.” Limnology and Oceanography 69 (1): 22–36. https://doi.org/10.1002/lno.12475.\n\n\nKhazaei, Bahram, Laura K. Read, Matthew Casali, Kevin M. Sampson, and David N. Yates. 2022. “GLOBathy, the Global Lakes Bathymetry Dataset.” Scientific Data 9 (1): 36. https://doi.org/10.1038/s41597-022-01132-9.\n\n\nKuhn, Max. 2008. “Building Predictive Models in R Using the Caret Package.” Journal of Statistical Software 28 (November): 1–26. https://doi.org/10.18637/jss.v028.i05.\n\n\nMessager, Mathis Loïc, Bernhard Lehner, Günther Grill, Irena Nedeva, and Oliver Schmitt. 2016. “Estimating the Volume and Age of Water Stored in Global Lakes Using a Geo-Statistical Approach.” Nature Communications 7 (1): 13603. https://doi.org/10.1038/ncomms13603."
   },
