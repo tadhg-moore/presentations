@@ -123,7 +123,7 @@ source("R/summarise_hyps.R")
 
 ##  {.smaller}
 
-FENZ Lakes
+Freshwater Ecosystems of New Zealand Database
 
 ::::: columns
 ::: {.column width="40%"}
@@ -201,17 +201,18 @@ p_fenz <- ggplot() +
   geom_vline(xintercept = c(3, 27.6), linetype = "dashed") +
   geom_point(data = df_fenz, aes(x = Depth, y = n, colour = GeomorphicType),
              alpha = 0.5, size = 0.5) +
-  scale_x_log10(breaks = c(1, 5, 10, 27.6, 50, 100, 400)) +
+  scale_x_log10(breaks = c(1, 3, 5, 10, 27.6, 50, 100, 400)) +
   labs(y = "Lakes", x = "Depth (m)", colour = "Geomorphic type")+
   scale_color_manual(values = geomorph_cols) +
   scale_y_continuous(breaks = seq(0, 3500, 500)) +
   # scale_y_discrete(limits = 1:nrow()) +
   theme_bw(base_size = 14) +
+  guides(colour = guide_legend(override.aes = list(size = 10))) +
   theme(#axis.text.y = element_blank(), axis.ticks.y = element_blank(), 
         legend.position = "bottom", legend.box = "horizontal",
         legend.title = element_text(size = 10),
         legend.text = element_text(size = 10))
-# p
+# p_fenz
 # ggplotly(p, height = 500, width = 600)
 
 
@@ -237,6 +238,7 @@ p_fenz <- ggplot() +
 
 # Legend
 l <- list(
+  legend = list(itemsizing = "constant"),
   font = list(
     family = "sans-serif",
     size = 12,
@@ -246,12 +248,14 @@ l <- list(
   bordercolor = "#FFFFFF",
   borderwidth = 2)
 
+# p_fenz$guides
+
 ggplotly(p_fenz, height = 500, width = 600, dynamicTicks = F) |> 
   layout(showlegend = T,
          legend = l)
 
 
-# library(plotly)
+  # library(plotly)
 # plot_ly() |> 
 #   add_histogram(data = fenz_depths, x = ~z_max, nbins = 50) |>
 #   layout(xaxis = list(title = "Depth (m)", type = "log"),
@@ -272,7 +276,7 @@ ggplotly(p_fenz, height = 500, width = 600, dynamicTicks = F) |>
 :::
 
 ::: fragment
--   Lake maximum depth data which were known, but did not have bathymetry data available were added to the dataset (n=`r n_depths - n_bathy`) bringing us to a total of `r n_depths` lakes with maximum depth data.
+-   Lake maximum depth data which were known, but did not have bathymetry data available were added to the dataset (n=`r n_depths - n_bathy`) bringing us to a total of `r n_depths` lakes with maximum depth data ([Lakes380](https://lakes380.com/)).
 :::
 
 ::: fragment
@@ -905,11 +909,12 @@ pred_median <- pred_depth |>
 ggplot() +
   geom_density(data = df_fenz, aes(x = Depth, colour = "FENZ"), alpha = 0.5) +
   geom_density(data = df_pred, aes(x = pred_max, colour = "ML model"), alpha = 0.5) +
+   geom_vline(xintercept = c(3, 27.6), linetype = "dashed") +
   geom_vline(data = fenz_median, linetype = "dashed", aes(xintercept = median, colour = "FENZ")) +
   geom_vline(data = pred_median, linetype = "dashed", aes(xintercept = median, colour = "ML model")) +
   scale_color_manual(values = cols_vec) +
   labs(x = "Depth (m)", y = "Density", colour = "Source") +
-  scale_x_log10(breaks = c(1, 5, 10, 27.6, 50, 100, 400)) +
+  scale_x_log10(breaks = c(1, 3, 5, 10, 27.6, 50, 100, 400)) +
   theme_bw(base_size = 14) 
 
 # 
