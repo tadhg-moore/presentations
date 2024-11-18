@@ -1,6 +1,6 @@
 ---
-title: Morphometric distribution of depth and basin shape in Aotearoa New Zealand lakes
-subtitle: Using machine learning to improve national lake depth predictions
+title: Using machine learning to improve national lake depth predictions
+subtitle: Morphometric distribution of depth and basin shape in Aotearoa New Zealand lakes
 format: 
   revealjs:
     theme: dark
