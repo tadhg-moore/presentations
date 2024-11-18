@@ -115,6 +115,10 @@ source("R/summarise_hyps.R")
 -   The Freshwater Ecosystems New Zealand (FENZ) database is the most comprehensive database of lake morphometry in New Zealand, but is limited in its depth data.
 -   NZ lakes provide a unique opportunity to develop a comprehensive database of lake depth and morphometry, particularly given the diversity of lake size, depth and geomorphic type.
 
+## Lake Ecosystem Research Modelling Platform {.smaller}
+
+![](www/lernzmp_overview.png)
+
 ## Objectives {.unnumbered .unlisted}
 
 -   Develop a comprehensive database of lake depth and morphometry for New Zealand.
@@ -132,7 +136,7 @@ Freshwater Ecosystems of New Zealand Database
 -   Current predictions of max lake depth, within the FENZ database (n=`r n_fenz`) are limited and have clear biases
 :::
 
-::: {.column width="60%" .fragment}
+::: {.column .fragment width="60%"}
 ```{r}
 #| label: fig-fenz-depth-distribution
 #| fig.cap: "Depth distribution of FENZ lakes. The x-axis is log10 scaled."
@@ -284,19 +288,24 @@ ggplotly(p_fenz, height = 500, width = 600, dynamicTicks = F) |>
 :::
 
 ::: fragment
--   Depth data were interpolated using a Multilevel B-Spline Approximation (MBA) algorithm. 
+-   Depth data were interpolated using a Multilevel B-Spline Approximation (MBA) algorithm.
 :::
 
-::: {.fragment}
--   Hypsographic curves were calculated for each lake. 
+::: fragment
+-   Hypsographic curves were calculated for each lake.
 :::
-::: {.fragment}
+
+::: fragment
 -   Comparison of depth and area with other databases.
 :::
 
-::: {.fragment}
--   Used machine learning to predict lake depth from morphometric data for all lakes in New Zealand and benchmark against the FENZ dataset. 
+::: fragment
+-   Used machine learning to predict lake depth from morphometric data for all lakes in New Zealand and benchmark against the FENZ dataset.
 :::
+
+## Bathymetry example: Lake Omapere paper map
+
+![](www/omapere_map.png)
 
 ## Bathymetry example: Lake Rotoma {.smaller .unnumbered .unlisted transition="fade"}
 
@@ -410,7 +419,9 @@ summ |>
 ::::: columns
 ::: {.column width="50%"}
 -   Lakes with bathymetric data are relatively evenly distributed across New Zealand.
+
 -   Lake geomorphic type is highly regionalised.
+
 -   Lakes which have maximum depth data but no bathymetry data highlight that there is probably a further bathymetry data out there.
 
 -   Some lakes, particularly glacial lakes might have quite a dynamic bathymetry.
@@ -585,7 +596,6 @@ pl$x$data[[idx]]$visible <- "legendonly"
 pl
 ```
 
-
 ## Distribution of volume development
 
 Development of Volume, $D_V$ (Hutchinson 1957) is a measure of departure of the shape of the lake basin from that of a cone calculated using the maximum depth $Z_{max}$ and the average depth $\bar{Z}$ :
@@ -641,11 +651,9 @@ p
 
 ```
 
-![](www/convex.png){.absolute top=30 right=60 width="140" height="90"}
+![](www/convex.png){.absolute top="30" right="60" width="140" height="90"}
 
-
-![](www/concave.png){.absolute bottom=180 right=60 width="140" height="90"}
-
+![](www/concave.png){.absolute bottom="180" right="60" width="140" height="90"}
 
 ## Predicting mean and max depth {.smaller .unnumbered .unlisted}
 
@@ -959,7 +967,6 @@ ggplot() +
 
 ```
 
-
 ## Conclusions {.r-fit-text data-name="Conclusions"}
 
 -   Bathymetric data from 156 lakes were digitised and collated for use in this study.
@@ -974,6 +981,12 @@ ggplot() +
 -   For lakes without bathymetric data, we can predict lake depth with a high degree of accuracy compared to other datasets.
 -   Highlights lakes with limited depth data to target for future surveying.
 -   Provides a comprehensive database of lake depth, morphometry and other characteristics within Aotearoa New Zealand for future research.
+
+## LERNZmp Platform
+
+https://limnotrack.shinyapps.io/LERNZmp/
+
+![](www/lernzmp_dashboard.png)
 
 ## Acknowledgements {.smaller}
 
