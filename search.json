@@ -7,6 +7,13 @@
     "text": "Motivation\n\nDeveloping the Lake Ecosystem Research New Zealand modelling platfom (LERNZmp). \nLake depth and morphometry are key drivers of lake ecosystem function, therefore accurate depth data is essential (Ganz, Glines, and Rose 2024).\nThe Freshwater Ecosystems New Zealand (FENZ) database is the most comprehensive database of lake morphometry in New Zealand, but is limited in its depth data.\nNZ lakes provide a unique opportunity to develop a comprehensive database of lake depth and morphometry, particularly given the diversity of lake size, depth and geomorphic type."
   },
   {
+    "objectID": "nzfss/nzfss_bathymetry_2024.html#lake-ecosystem-research-modelling-platform",
+    "href": "nzfss/nzfss_bathymetry_2024.html#lake-ecosystem-research-modelling-platform",
+    "title": "Using machine learning to improve national lake depth predictions",
+    "section": "Lake Ecosystem Research Modelling Platform",
+    "text": "Lake Ecosystem Research Modelling Platform"
+  },
+  {
     "objectID": "nzfss/nzfss_bathymetry_2024.html#objectives",
     "href": "nzfss/nzfss_bathymetry_2024.html#objectives",
     "title": "Using machine learning to improve national lake depth predictions",
@@ -26,6 +33,13 @@
     "title": "Using machine learning to improve national lake depth predictions",
     "section": "Methods",
     "text": "Methods\n\n\nBathymetry survey data were sourced from a variety of sources - paper maps, digital files, and online databases (n=156).\n\n\n\n\nLake maximum depth data which were known, but did not have bathymetry data available were added to the dataset (n=36) bringing us to a total of 192 lakes with maximum depth data (Lakes380).\n\n\n\n\nShoreline data were updated using satellite and aerial imagery.\n\n\n\n\nDepth data were interpolated using a Multilevel B-Spline Approximation (MBA) algorithm.\n\n\n\n\nHypsographic curves were calculated for each lake.\n\n\n\n\nComparison of depth and area with other databases.\n\n\n\n\nUsed machine learning to predict lake depth from morphometric data for all lakes in New Zealand and benchmark against the FENZ dataset."
+  },
+  {
+    "objectID": "nzfss/nzfss_bathymetry_2024.html#bathymetry-example-lake-omapere-paper-map",
+    "href": "nzfss/nzfss_bathymetry_2024.html#bathymetry-example-lake-omapere-paper-map",
+    "title": "Using machine learning to improve national lake depth predictions",
+    "section": "Bathymetry example: Lake Omapere paper map",
+    "text": "Bathymetry example: Lake Omapere paper map"
   },
   {
     "objectID": "nzfss/nzfss_bathymetry_2024.html#bathymetry-example-lake-rotoma",
@@ -53,7 +67,7 @@
     "href": "nzfss/nzfss_bathymetry_2024.html#bathymetry-example-lake-rotoma-3",
     "title": "Using machine learning to improve national lake depth predictions",
     "section": "Bathymetry example: Lake Rotoma",
-    "text": "Bathymetry example: Lake Rotoma\n\n\nEstimated hypsographic curve\n\n\n\n\n\n\n\n\nFigure 5: Hypsograph curve of Lake Rotoma.\n\n\n\n\n\n\nHypsographic summary\n\n\n\n\nTable 1: Hypsographic summary of Lake Rotoma\n\n\n\n\n\n\nVariable\nValue\n\n\n\n\nMax depth\n89.69\n\n\nMean depth\n45.39\n\n\nVolume development index\n1.52\n\n\nArea (ha)\n1063.48\n\n\nShoreline length (km)\n23.40\n\n\nShoreline development index\n2.04"
+    "text": "Bathymetry example: Lake Rotoma\n\n\nEstimated hypsographic curve\n\n\n\n\n\n\n\n\nFigure 5: Hypsograph curve of Lake Rotoma.\n\n\n\n\n\n\nHypsographic summary\n\n\n\n\nTable 1: Hypsographic summary of Lake Rotoma\n\n\n\n\n\n\nVariable\nValue\n\n\n\n\nMax depth\n90.37\n\n\nMean depth\n45.41\n\n\nVolume development index\n1.51\n\n\nArea (ha)\n1062.62\n\n\nShoreline length (km)\n23.40\n\n\nShoreline development index\n2.04"
   },
   {
     "objectID": "nzfss/nzfss_bathymetry_2024.html#lakes-with-bathymetry-data",
@@ -124,6 +138,13 @@
     "title": "Using machine learning to improve national lake depth predictions",
     "section": "Applications",
     "text": "Applications\n\nAll data is available within the LERNZmp.\nFor lakes without bathymetric data, we can predict lake depth with a high degree of accuracy compared to other datasets.\nHighlights lakes with limited depth data to target for future surveying.\nProvides a comprehensive database of lake depth, morphometry and other characteristics within Aotearoa New Zealand for future research."
+  },
+  {
+    "objectID": "nzfss/nzfss_bathymetry_2024.html#lernzmp-platform",
+    "href": "nzfss/nzfss_bathymetry_2024.html#lernzmp-platform",
+    "title": "Using machine learning to improve national lake depth predictions",
+    "section": "LERNZmp Platform",
+    "text": "LERNZmp Platform\nhttps://limnotrack.shinyapps.io/LERNZmp/"
   },
   {
     "objectID": "nzfss/nzfss_bathymetry_2024.html#acknowledgements",
